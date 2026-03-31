@@ -182,7 +182,11 @@ export default function Home() {
             <motion.div {...fadeIn} className="max-w-2xl">
               <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">Fresh Harvest</Badge>
               <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6">Explore Our Products</h2>
-              <p className="text-muted-foreground text-lg leading-relaxed">Premium organic dragon fruits. Rich in antioxidants, vitamins, and incredible taste. Grown naturally without chemicals.</p>
+              <p className="text-muted-foreground text-lg leading-relaxed">Top sellers & best products from our 50+ premium dragon fruit varieties. Grown naturally without chemicals.</p>
+            </motion.div>
+            <motion.div {...fadeIn} className="flex gap-3 shrink-0">
+              <Badge className="bg-primary/10 text-primary border-primary/20 px-3 py-1.5 text-sm font-semibold rounded-full">⭐ Top Seller</Badge>
+              <Badge className="bg-secondary/10 text-secondary border-secondary/20 px-3 py-1.5 text-sm font-semibold rounded-full">✓ Best Product</Badge>
             </motion.div>
           </div>
 
@@ -196,75 +200,114 @@ export default function Home() {
                   <Skeleton className="h-12 w-full mt-4 rounded-full" />
                 </div>
               ))
-            ) : products?.map((product, i) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-              >
-                <Card className="overflow-hidden group h-full flex flex-col border border-zinc-100 dark:border-zinc-800 rounded-2xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-zinc-900/80">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-                    <img 
-                      src={product.imageUrl} 
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    {product.badge && (
-                      <Badge className="absolute top-4 left-4 bg-primary text-white border-none shadow-lg px-3 py-1 font-semibold uppercase tracking-wider text-[10px]">
-                        {product.badge}
-                      </Badge>
-                    )}
-                    {!product.inStock && (
-                      <div className="absolute inset-0 bg-white/80 dark:bg-black/70 flex items-center justify-center backdrop-blur-sm z-10">
-                        <Badge variant="outline" className="text-lg py-2 px-6 border-2 border-foreground bg-background font-bold">Out of Stock</Badge>
+            ) : (
+              <>
+                {products?.filter(p => p.featured || p.badge).map((product, i) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: Math.min(i * 0.08, 0.5) }}
+                  >
+                    <Card className="overflow-hidden group h-full flex flex-col border border-zinc-100 dark:border-zinc-800 rounded-2xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-zinc-900/80">
+                      <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                        <img 
+                          src={product.imageUrl} 
+                          alt={product.name}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1618897996318-5a901fa6ca71?w=400&q=70"; }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        
+                        {product.badge && (
+                          <Badge className={`absolute top-4 left-4 border-none shadow-lg px-3 py-1 font-bold uppercase tracking-wider text-[10px] ${
+                            product.badge === 'Top Seller' ? 'bg-secondary text-white' :
+                            product.badge === 'Best Product' ? 'bg-primary text-white' :
+                            product.badge === 'Premium' ? 'bg-yellow-500 text-white' :
+                            product.badge === 'Rare' ? 'bg-purple-600 text-white' :
+                            product.badge === 'Collector' ? 'bg-blue-600 text-white' :
+                            'bg-primary text-white'
+                          }`}>
+                            {product.badge}
+                          </Badge>
+                        )}
+                        {!product.inStock && (
+                          <div className="absolute inset-0 bg-white/80 dark:bg-black/70 flex items-center justify-center backdrop-blur-sm z-10">
+                            <Badge variant="outline" className="text-lg py-2 px-6 border-2 border-foreground bg-background font-bold">Out of Stock</Badge>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <CardContent className="p-8 flex-1 flex flex-col">
-                    <h3 className="font-heading font-bold text-2xl mb-3">{product.name}</h3>
-                    <p className="text-muted-foreground mb-6 line-clamp-2 flex-1 text-sm leading-relaxed">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between mt-auto mb-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-                      <span className="font-heading font-bold text-3xl text-foreground">
-                        ₹{product.price}
-                        <span className="text-base font-normal text-muted-foreground font-sans"> / {product.unit}</span>
-                      </span>
-                    </div>
-                    <div className="flex gap-3">
-                      <Button
-                        className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 rounded-full shadow-lg"
-                        disabled={!product.inStock}
-                        onClick={() => addItem({
-                          id: product.id,
-                          name: product.name,
-                          price: product.price,
-                          unit: product.unit,
-                          imageUrl: product.imageUrl,
-                        })}
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add to Cart
-                      </Button>
-                      <a href={getWhatsAppUrl(product.name)} target="_blank" rel="noopener noreferrer">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-12 w-12 rounded-full border-secondary text-secondary hover:bg-secondary hover:text-white shrink-0"
-                          disabled={!product.inStock}
-                        >
-                          <MessageCircle className="w-5 h-5" />
-                        </Button>
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                      <CardContent className="p-8 flex-1 flex flex-col">
+                        <h3 className="font-heading font-bold text-2xl mb-3">{product.name}</h3>
+                        <p className="text-muted-foreground mb-6 line-clamp-2 flex-1 text-sm leading-relaxed">
+                          {product.description}
+                        </p>
+                        <div className="flex items-center justify-between mt-auto mb-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
+                          <span className="font-heading font-bold text-3xl text-foreground">
+                            ₹{product.price}
+                            <span className="text-base font-normal text-muted-foreground font-sans"> / {product.unit}</span>
+                          </span>
+                        </div>
+                        <div className="flex gap-3">
+                          <Button
+                            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 rounded-full shadow-lg"
+                            disabled={!product.inStock}
+                            onClick={() => addItem({
+                              id: product.id,
+                              name: product.name,
+                              price: product.price,
+                              unit: product.unit,
+                              imageUrl: product.imageUrl,
+                            })}
+                          >
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            Add to Cart
+                          </Button>
+                          <a href={getWhatsAppUrl(product.name)} target="_blank" rel="noopener noreferrer">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-12 w-12 rounded-full border-secondary text-secondary hover:bg-secondary hover:text-white shrink-0"
+                              disabled={!product.inStock}
+                            >
+                              <MessageCircle className="w-5 h-5" />
+                            </Button>
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+
+                {/* View All Products Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                >
+                  <Link href="/products">
+                    <Card className="overflow-hidden group h-full flex flex-col border-2 border-dashed border-primary/30 hover:border-primary rounded-2xl hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 bg-primary/3 hover:bg-primary/5 cursor-pointer min-h-[400px]">
+                      <CardContent className="flex-1 flex flex-col items-center justify-center p-10 text-center gap-6">
+                        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                          <ArrowRight className="w-10 h-10 text-primary group-hover:translate-x-1 transition-transform" />
+                        </div>
+                        <div>
+                          <h3 className="font-heading font-bold text-2xl text-primary mb-3">View All Products</h3>
+                          <p className="text-muted-foreground text-sm leading-relaxed">
+                            Browse our complete catalog of 50+ premium dragon fruit plant varieties
+                          </p>
+                        </div>
+                        <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1.5 rounded-full font-semibold">
+                          50+ Varieties →
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              </>
+            )}
           </div>
 
           {/* View Full Catalog Button */}

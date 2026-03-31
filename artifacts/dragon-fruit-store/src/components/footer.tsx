@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { LeafyGreen, Instagram, Facebook, MessageCircle } from "lucide-react";
+import { Instagram, Facebook, MessageCircle } from "lucide-react";
 
 export function Footer() {
   return (
@@ -8,12 +8,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-                <LeafyGreen className="w-7 h-7" />
+              <img src="/logo.png" alt="Katiyar Nursery" className="w-14 h-14 rounded-full shadow-lg shadow-primary/30 object-cover" />
+              <div>
+                <span className="font-heading font-bold text-2xl tracking-tight text-white block">
+                  Katiyar Nursery
+                </span>
+                <span className="text-zinc-400 text-sm">Dragon Fruit Farm, Kanpur</span>
               </div>
-              <span className="font-heading font-bold text-2xl tracking-tight text-white">
-                Dragon Fruit Farm
-              </span>
             </div>
             <p className="text-zinc-400 max-w-sm mb-8 leading-relaxed text-lg">
               Premium organic dragon fruits grown with love and delivered fresh from our farm to your home. Taste the difference of purely natural farming.
@@ -62,7 +63,7 @@ export function Footer() {
         </div>
         
         <div className="border-t border-zinc-800 pt-8 flex flex-col md:flex-row items-center justify-between text-zinc-500 text-sm">
-          <p>© {new Date().getFullYear()} Dragon Fruit Farm. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Katiyar Nursery, Kanpur. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>

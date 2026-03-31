@@ -1,0 +1,402 @@
+const productData = [
+  {
+    id: 1,
+    name: "Jumboo Red Dragon Fruit Plant",
+    description: "The Jumbo Red Dragon Fruit, also known as Red Pitaya or Strawberry Pear, is a striking variety of dragon fruit characterized by its large, bright red fruit with a vibrant red flesh and black, edible seeds",
+    price: 100,
+    image: "img/1.jpg",
+    category: "plant"
+  },
+  {
+    id: 2,
+    name: "Morrocan Red Dragon Fruit Plant",
+    description: "Moroccan Red dragon fruit is a red-fleshed variety of dragon fruit known for its vibrant red skin and flesh, and relatively sweet, tangy taste. ",
+    price: 100,
+    image: "https://5.imimg.com/data5/ANDROID/Default/2021/10/TS/RB/PL/71508076/product-jpeg.jpg",
+    category: "plant"
+  },
+  {
+    id: 3,
+    name: "C Variety Dragon Fruit Plant",
+    description: "The term C variety dragon fruit generally refers to a specific type of dragon fruit, often associated with the Siam Red variety, known for its striking red skin and sweet, succulent red flesh.",
+    price: 100,
+    image: "https://5.imimg.com/data5/SELLER/Default/2025/4/501833980/UP/HO/ET/18505715/pink-rose-dragon-fruit-plant-500x500.jpg",
+    category: "plant"
+  },
+  {
+    id: 4,
+    name: "Regular Red Dragon Fruit Plant",
+    description: "A regular red dragon fruit, also known as red pitaya, is a variety of dragon fruit characterized by its bright pink or red skin with green, scale-like protrusions and deep red or magenta flesh, speckled with tiny black seeds",
+    price: 100,
+    image: "https://media.post.rvohealth.io/wp-content/uploads/2024/01/A-pink-pitahaya-cut-it-in-half-Dragon-Fruit-facebook.jpg",
+    category: "plant"
+  },
+  {
+    id: 5,
+    name: "Vietnamese Dragon Fruit Plant",
+    description: "Vietnamese dragon fruit, also known as pitaya or strawberry pear, is a tropical fruit with a vibrant exterior and sweet, seed-speckled pulp. ",
+    price: 180,
+    image: "https://dragonfruitobsession.github.io/varieties/Variety%20Photos/Vietnam%20White/Vietnam%20White%20-%20Fruit%204.jpg",
+    category: "plant"
+  },
+  {
+    id: 6,
+    name: "Israel Yellow Dragon Fruit Plant",
+    description: "Its sweet and mildly tangy flavor profile makes it a delightful addition to smoothies, fruit salads, desserts.Israeli yellow Dragon fruit is Sweet,Juicy and very delicious test.",
+    price: 200,
+    image: "img/6.jpg",
+    category: "plant"
+  },
+  {
+    id: 7,
+    name: "Palora Dragon Fruit Plant",
+    description: "Palora dragon fruit, also known as yellow dragon fruit, is a variety of dragon fruit characterized by its yellow skin and sweet white flesh, cultivar of Selenicereus megalanthus and originates from the town of Palora in Ecuador. ",
+    price: 350,
+    image: "img/7.jpg",
+    category: "plant"
+  },
+  {
+    id: 8,
+    name: "Desert King Dragon Fruit Plant",
+    description: "Desert King dragon fruit is a high-yield, grafted variety known for its large, juicy, and sweet red flesh. It's a popular choice for both home gardeners and commercial growers due to its early and abundant fruit production.",
+    price: 600,
+    image: "img/8.jpg",
+    category: "plant"
+  },
+  {
+    id: 9,
+    name: "Godzilla Dragon Fruit Plant",
+    description: "Godzilla dragon fruit, also known as Japanese Godzilla, is a variety known for its robust green-grey stems, vibrant pink/red skin with green tips, and bright pink, firm, and sweet flesh. It originated in Japan and is characterized by its rounded fruit shape and a natural waxy coating on the stems that acts as sunscreen.",
+    price: 400,
+    image: "https://5.imimg.com/data5/ANDROID/Default/2023/1/IG/DK/RV/180142912/product-jpeg-500x500.jpg",
+    category: "plant"
+  },
+  {
+    id: 10,
+    name: "Bruni Dragon Fruit Plant",
+    description: "Bruni dragon fruit is a unique white-fleshed variety, known for its small size and complex, flavorful taste often described as having hints of coconut or floral notes, sometimes even resembling lychee or longan",
+    price: 350,
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUQQAuPCIKsL_YOF8YVKm6XWgKir2p3liKP2yqhrqWSD9oZWrWIjO_UzB4pQDQ121GLs8&usqp=CAU",
+    category: "plant"
+  },
+   { 
+    id: 11, 
+    name: "Connie Mayer Dragon Fruit Plant", 
+    description: "This beautiful hybrid variety was developed by renowned horticulturist Connie Mayer. It combines the best traits of multiple species - exceptional sweetness, vibrant color, and high yield. The fruits have a distinctive star-shaped cross-section when cut.", 
+    price: 350, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCdR8B57qdWpV1vC0FK-vz2PGSZOfy2FJ33FnftuU6s6TYlHNj7J4SyZLXTFFkJlT2w5Y&usqp=CAU", 
+    category: "plant" 
+  },
+  { 
+    id: 12, 
+    name: "Physical Graffiti Dragon Fruit Plant", 
+    description: "Named for its stunning skin patterns that resemble abstract art, this variety is as delicious as it is beautiful. The flesh is deep purple with an intense berry-like flavor. Each fruit develops unique markings, making every piece one-of-a-kind.", 
+    price: 450, 
+    image: "https://images.squarespace-cdn.com/content/v1/5cdb551c35d35b0001dbdcc7/1619883421838-7YV2JGZQ568TIR2Y8T4C/Dragonfruit_PhysicalGraffiti.jpg?format=2500w", 
+    category: "plant" 
+  },
+  { 
+    id: 13, 
+    name: "Purple Haze Dragon Fruit Plant", 
+    description: "Purple Haze lives up to its name with strikingly colored flesh that's among the deepest purple of any variety. The flavor is rich and complex, with notes of grape and blackberry. The color intensifies when the fruit is fully ripe, making it spectacular for presentations.", 
+    price: 400, 
+    image: "https://dragonfruitobsession.github.io/varieties/Variety%20Photos/Malaysian%20Purple/Malaysian%20Purple%20-%20Fruit%204.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 14, 
+    name: "Maria Rosa Dragon Fruit Plant", 
+    description: "Maria Rosa is a pink-skinned variety with delicate flavor that's less sweet but more aromatic than most. The flesh is crisp with floral notes that pair beautifully with light desserts. The plants are particularly ornamental, with showy flowers and fruits.", 
+    price: 400, 
+    image: "https://paradiseflowers.in/wp-content/uploads/2021/09/IMG_20210910_115928-300x300.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 15, 
+    name: "American Beauty Dragon Fruit Plant", 
+    description: "This widely loved variety is known for its consistent quality and beautiful presentation. The bright pink skin covers sweet, magenta flesh that's perfect for fruit platters. American Beauty plants are vigorous growers that adapt well to various conditions.", 
+    price: 300, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0wwL1_7uBJeF9S3Fkwh4gGvwhj_kD9cRiRQ&s", 
+    category: "plant" 
+  },
+  { 
+    id: 16, 
+    name: "Chameleon Dragon Fruit Plant", 
+    description: "The Chameleon variety earns its name from fruits that change color as they ripen, progressing through shades of green, pink, and red. The flavor evolves similarly, starting tart and becoming intensely sweet. A true conversation piece for exotic fruit enthusiasts.", 
+    price: 650, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQahmPsjVBclKwMGTKGxY77uDVgD3PmMTVwiw&s", 
+    category: "plant" 
+  },
+  { 
+    id: 17, 
+    name: "Black African Dragon Fruit Plant", 
+    description: "This rare variety has the darkest skin of any dragon fruit, appearing nearly black when ripe. The contrast with the bright red flesh inside is stunning. The flavor is rich and wine-like, with more complexity than typical sweet varieties.", 
+    price: 450, 
+    image: "https://m.media-amazon.com/images/I/41zMKdi8bML._UF1000,1000_QL80_.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 18, 
+    name: "Ax Hybrid Dragon Fruit Plant", 
+    description: "The Ax Hybrid was developed specifically for commercial production, combining large fruit size with excellent shelf life. The flavor is straightforwardly sweet without being cloying, making it popular with first-time dragon fruit buyers.", 
+    price: 450, 
+    image: "img/18.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 19, 
+    name: "White Crystal Dragon Fruit Plant", 
+    description: "White Crystal is prized for its pure white flesh that's exceptionally crisp and refreshing. The flavor is clean and mildly sweet, making it perfect for pairing with stronger flavors. The fruits have particularly long shelf life compared to other varieties.", 
+    price: 500, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBmzYWCW2T5BWxO8KmbdQUn_8s15ZdRSVoew&s", 
+    category: "plant" 
+  },
+  { 
+    id: 20, 
+    name: "Sin Espinas Dragon Fruit Plant", 
+    description: "True to its name ('Without Thorns'), this variety has smooth stems and fruits that are easy to handle. The flavor is mild but pleasant, with hints of melon. Ideal for families with children who want to enjoy dragon fruit without the prickly exterior.", 
+    price: 500, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGbroH7UFpeoslgdEF3Nele74A_TolHSjKKA&s", 
+    category: "plant" 
+  },
+  { 
+    id: 21, 
+    name: "Sugar8 Dragon Fruit Plant", 
+    description: "Sugar8 is the sweetest dragon fruit variety we offer, with brix levels that can rival mangoes when fully ripe. The small to medium fruits pack incredible flavor intensity. The flesh is deep red with small seeds that add pleasant texture.", 
+    price: 600, 
+    image: "http://spicyexotics.com/wp-content/uploads/Images/Products/SD/Sugar-Dragon-Dragon-Fruit-Fruit-optimized.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 22, 
+    name: "Lemon Orange/Lemon Yellow Dragon Fruit Plant", 
+    description: "This citrus-named variety offers bright, tangy flavors unusual in dragon fruits. The flesh has distinct lemon and orange notes that make it perfect for refreshing summer dishes. The yellow skin develops pink blush when exposed to sun.", 
+    price: 350, 
+    image: "https://5.imimg.com/data5/ANDROID/Default/2023/1/MT/KE/HY/180142912/product-jpeg.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 23, 
+    name: "Delight Dragon Fruit Plant ", 
+    description: "Delight lives up to its name with fruits that are consistently enjoyable. The texture is particularly soft and creamy compared to most varieties. The balanced sweetness makes it excellent for eating fresh or blending into smoothies.", 
+    price: 350, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSafyI8ULrYSC2OPbvmY5hFpBZ32TcVg0lGaA&s", 
+    category: "plant" 
+  },
+  { 
+    id: 24, 
+    name: "Baby Cerrado Dragon Fruit Plant", 
+    description: "This petite variety produces small but incredibly flavorful fruits. The Baby Cerrado packs more sweetness per ounce than larger varieties, with intense tropical notes. The compact plants make excellent container specimens for home growers.", 
+    price: 350, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSO6XpwmPFjXDKyNfl0t3wZD4gw-5ruNy8-HQ&s", 
+    category: "plant" 
+  },
+  { 
+    id: 25, 
+    name: "Red Jaina Dragon Fruit Plant", 
+    description: "Red Jaina is a bold-flavored variety with intense tropical character. The fruits are medium-sized but packed with flavor that includes notes of passionfruit and berry. The plants are particularly disease-resistant, making them gardener favorites.", 
+    price: 490, 
+    image: "img/25.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 26, 
+    name: "Vietnamese White Dragon Fruit Plant", 
+    description: "This classic white-fleshed variety is Vietnam's most exported dragon fruit. The subtle sweetness and crisp texture make it versatile for both sweet and savory applications. The large fruits have excellent shipping qualities.", 
+    price: 180, 
+    image: "https://dragonfruitobsession.github.io/varieties/Variety%20Photos/Vietnam%20White/Vietnam%20White%20-%20Fruit%203.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 27, 
+    name: "Halley's Comet Dragon Fruit Plant", 
+    description: "Named for its rarity and spectacular appearance, Halley's Comet produces large fruits with striking coloration. The flavor is sweet with caramel undertones that develop when fully ripe. A true collector's variety that's as delicious as it is beautiful.", 
+    price: 400, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQs-Jybh2VFWBbXPvsmLKzrQyMUgmK6Ot4mkA&s", 
+    category: "plant" 
+  },
+  { 
+    id: 28, 
+    name: "White Sapphire Dragon Fruit Plant", 
+    description: "White Sapphire is a premium white-fleshed variety with exceptional clarity of flavor. The mild sweetness is complemented by subtle floral notes. The fruits have particularly thin skin, meaning more edible portion per fruit.", 
+    price: 400, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3tZNjzjAzzTgaziJ0bbq0E59j2eJbVHgPeA&s", 
+    category: "plant" 
+  },
+  { 
+    id: 29, 
+    name: "Tricia Dragon Fruit Plant", 
+    description: "Tricia is a reliable mid-season variety known for its bright skin and refreshing flavor. The balanced sweetness makes it excellent for juicing. The plants are particularly productive, often bearing multiple crops per year.", 
+    price: 350, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7VfDee1FpnCafy3CKRJeefTNkdko8KhajPw&s", 
+    category: "plant" 
+  },
+  { 
+    id: 30, 
+    name: "Rainbow Dragon Fruit Plant", 
+    description: "Rainbow variety fruits display a spectacular range of colors as they ripen, often showing multiple hues simultaneously. The flavor is as complex as the appearance, with layers of tropical fruit notes. Each fruit is unique in its color pattern.", 
+    price: 470, 
+    image: "img/30.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 31, 
+    name: "Asunta - 1 Dragon Fruit Plant", 
+    description: "The first in the renowned Asunta series, this variety sets the standard for exotic dragon fruits. The flesh has a distinctive crystalline texture that's both crisp and juicy. The flavor profile includes hints of lychee and pear.", 
+    price: 500, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuvx4THZg8NVvZAvgEJwG4RTNBEcbzCdFUWQ&s", 
+    category: "plant" 
+  },
+  { 
+    id: 32, 
+    name: "Asunta - 2 Dragon Fruit Plant", 
+    description: "Asunta-2 builds on its predecessor's qualities with even more vibrant coloration. The flesh is deep purple with excellent firmness that holds up well in culinary preparations. The flavor has more berry notes than Asunta-1.", 
+    price: 500, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTerq_Qy33G5zVVQtNPFypnyAN0lsRyN4sdzg&s", 
+    category: "plant" 
+  },
+  { 
+    id: 33, 
+    name: "Asunta - 3 Dragon Fruit Plant", 
+    description: "The third in the Asunta series offers the perfect balance between sweetness and acidity. The fruits are particularly symmetrical with uniform size that's ideal for commercial packaging. The skin develops a beautiful glossy sheen when ripe.", 
+    price: 500, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlmoOYnpSlW9VvRZksVhD26Fp7_cqqWwhddg&s", 
+    category: "plant" 
+  },
+  { 
+    id: 34, 
+    name: "Asunta - 4 Dragon Fruit Plant", 
+    description: "Asunta-4 is distinguished by its exceptionally high antioxidant content, evident in the deep color of its flesh. The flavor is rich and complex, with wine-like notes that develop fully when the fruit is at peak ripeness.", 
+    price: 500, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIiMl44KH9Mbm4nNakUQ4HRX0zoVrBJKhGow&s", 
+    category: "plant" 
+  },
+  { 
+    id: 35, 
+    name: "Asunta - 5 Dragon Fruit Plant", 
+    description: "The crowning achievement of the Asunta series, this variety combines all the best traits - exceptional flavor, stunning appearance, and reliable production. The large fruits have thick flesh with small seed cavities, maximizing edible portion.", 
+    price: 500, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtEoOHlf9oDxtGdlwQo_9dVdISGKjnDnw4_Q&s", 
+    category: "plant" 
+  },
+  { 
+    id: 36, 
+    name: "Lavener Red Dragon Fruit Plant", 
+    description: "Lavener Red has a distinctive lavender hue to its skin that sets it apart from other red varieties. The flesh is particularly juicy with balanced sweetness. The plants are compact growers suitable for small spaces.", 
+    price: 400, 
+    image: "https://spicyexotics.com/wp-content/uploads/2021/08/La-Verne-Red-Dragon-Fruit-by-Spicy-Exotics.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 37, 
+    name: "Lavener Pink Dragon Fruit Plant", 
+    description: "The pink-skinned version of the Lavener series has even more floral aroma than its red counterpart. The flesh is firm yet melting, with a texture reminiscent of ripe peach. The beautiful appearance makes it a favorite for garnishes.", 
+    price: 500, 
+    image: "https://m.media-amazon.com/images/I/71IX0llkTeL._UF1000,1000_QL80_.jpg", 
+    category: "fruit" 
+  },
+  { 
+    id: 38, 
+    name: "Donaverre Laverene Dragon Fruit Plant", 
+    description: "This French-developed variety combines elegance with robust flavor. The fruits are medium-sized but packed with intense tropical taste. The skin has a unique pebbled texture that distinguishes it from smoother varieties.", 
+    price: 450, 
+    image: "https://plantinfo.co.za/wp-content/uploads/2024/10/Dragon-fruit-on-the-plant-how-to-grow-dragon-fruit.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 39, 
+    name: "Country Road Dragon Fruit Plant", 
+    description: "Country Road is a hardy variety that thrives in less-than-ideal conditions while still producing quality fruits. The flavor is straightforwardly sweet with good acidity balance. An excellent choice for beginning dragon fruit growers.", 
+    price: 400, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjAvcTc9jYtOKPthqX5FnpDC67CUb53GHbww&s", 
+    category: "plant" 
+  },
+  { 
+    id: 40, 
+    name: "Trish Red Dragon Fruit Plant", 
+    description: "Named for its developer Trish, this variety is known for its early ripening and reliable production. The fruits are uniformly sized with deep red flesh that's high in betalain pigments. The flavor has distinct raspberry notes.", 
+    price: 500, 
+    image: "https://5.imimg.com/data5/ANDROID/Default/2023/2/QS/FH/EO/3145959/product-jpeg.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 41, 
+    name: "Thick King Dragon Fruit Plant", 
+    description: "Thick King lives up to its name with an exceptionally high flesh-to-skin ratio. The thick rind makes it excellent for shipping while protecting the sweet, juicy interior. The flavor is straightforward and crowd-pleasing.", 
+    price: 550, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgogcDDEkCQP2wBkvnym1MWBanfn8HrM9HOA&s", 
+    category: "plant" 
+  },
+  { 
+    id: 42, 
+    name: "Townsend Pink Dragon Fruit Plant", 
+    description: "Townsend Pink is a premium variety with fruits that command top prices in specialty markets. The intense pink color extends through both skin and flesh. The flavor is exceptionally sweet with floral undertones.", 
+    price: 800, 
+    image: "https://i.pinimg.com/736x/fd/58/bd/fd58bdccdf38ccbf309aece99af8b042.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 43, 
+    name: "Mac Dragon Fruit Plant", 
+    description: "The Mac variety is known for its consistent quality and good shelf life. The flavor is balanced and approachable, making it a good introductory dragon fruit. The plants are particularly resistant to common diseases.", 
+    price: 500, 
+    image: "https://5.imimg.com/data5/PF/LH/LL/NSDMERP-38038631/38038631-product-1563262915783-500x500.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 44, 
+    name: "Queen of the Night Dragon Fruit Plant", 
+    description: "This variety gets its name from its spectacular night-blooming flowers that precede fruit set. The fruits themselves are medium-sized but packed with complex flavor that includes hints of vanilla and spice.", 
+    price: 500, 
+    image: "https://i.etsystatic.com/19975874/r/il/848cbb/3056476504/il_1080xN.3056476504_9ode.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 45, 
+    name: "Hana Dragon Fruit Plant", 
+    description: "Hana means 'flower' in Hawaiian, and this variety produces particularly beautiful blooms. The fruits are sweet with a clean, refreshing finish. The skin develops attractive striping as it ripens.", 
+    price: 500, 
+    image: "https://www.paudhewale.com/s/660a356584d1ac2391ae69de/687f78a88d45bf1a18525ecb/img-20241223-wa0005-640x640.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 46, 
+    name: "Frankies Red Dragon Fruit Plant", 
+    description: "Frankies Red is a compact variety that produces small but intensely flavored fruits. The deep red flesh has high antioxidant content. The plants are ideal for container growing on patios or balconies.", 
+    price: 500, 
+    image: "https://i.etsystatic.com/18558976/r/il/36a9d2/2369491475/il_570xN.2369491475_ocgw.jpg", 
+    category: "plant" 
+  },
+  { 
+    id:47,
+    name: "San Ignacio Dragon Fruit Plant", 
+    description: "Originating from the San Ignacio region, this variety has adapted to thrive in diverse conditions. The fruits are large with thick skin that protects the sweet, mildly flavored flesh. An excellent all-purpose dragon fruit.", 
+    price: 650, 
+    image: "http://spicyexotics.com/wp-content/uploads/2022/12/San-Ignacio-Dragon-Fruit-Spicy-Exotics.jpg", 
+    category: "plant" 
+  },
+  { 
+    id: 48, 
+    name: "Worth Yellow Dragon Fruit Plant", 
+    description: "Worth Yellow is among the sweetest of the yellow-skinned varieties. The flesh is white with a texture that's creamier than most dragon fruits. The plants are vigorous growers that produce heavy yields.", 
+    price: 600, 
+    image: "https://via.placeholder.com/150", 
+    category: "plant" 
+  },
+  { 
+    id: 49, 
+    name: "Worth Variegated Dragon Fruit Plant", 
+    description: "This extremely rare variegated variety is prized by collectors worldwide. The stunning foliage is striped with cream and green, while the fruits display similar variegation. The flavor is excellent as well, making it truly worth the premium price.", 
+    price: 2000, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGtqZgL_ud_TcdbmOlm-_PcBFuGV1wZhi-7Q&s", 
+    category: "plant" 
+  },
+  { 
+    id: 50, 
+    name: "Chimera Dragon Fruit Plant", 
+    description: "The Chimera represents the pinnacle of dragon fruit breeding - a true masterpiece of nature. Each fruit displays unique color patterns that can include multiple hues simultaneously. The flavor is equally spectacular, combining intense sweetness with complex tropical notes. A once-in-a-lifetime tasting experience.", 
+    price: 1000, 
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmCLtG4yMzF7nxH8lhlx9ft0iURMRkHed9vw&s", 
+    category: "plant"
+  }
+];
