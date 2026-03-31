@@ -1,15 +1,20 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Dragon Fruit Farm Store API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: products
+    description: Product management
+  - name: reviews
+    description: Customer reviews
+  - name: gallery
+    description: Gallery images
 paths:
   /healthz:
     get:
@@ -24,6 +29,154 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /products:
+    get:
+      operationId: getProducts
+      tags: [products]
+      summary: Get all products
+      description: Returns all available products
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [products]
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProduct"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateProduct
+      tags: [products]
+      summary: Update a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProduct"
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteProduct
+      tags: [products]
+      summary: Delete a product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /reviews:
+    get:
+      operationId: getReviews
+      tags: [reviews]
+      summary: Get all reviews
+      responses:
+        "200":
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Review"
+  /gallery:
+    get:
+      operationId: getGallery
+      tags: [gallery]
+      summary: Get gallery images
+      responses:
+        "200":
+          description: List of gallery images
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryImage"
+  /store-stats:
+    get:
+      operationId: getStoreStats
+      tags: [products]
+      summary: Get store statistics
+      responses:
+        "200":
+          description: Store stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoreStats"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +186,139 @@ components:
           type: string
       required:
         - status
-
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        unit:
+          type: string
+        imageUrl:
+          type: string
+        badge:
+          type: string
+          nullable: true
+        inStock:
+          type: boolean
+        featured:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - description
+        - price
+        - unit
+        - imageUrl
+        - inStock
+        - featured
+        - createdAt
+    CreateProduct:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        unit:
+          type: string
+        imageUrl:
+          type: string
+        badge:
+          type: string
+          nullable: true
+        inStock:
+          type: boolean
+        featured:
+          type: boolean
+      required:
+        - name
+        - description
+        - price
+        - unit
+        - imageUrl
+        - inStock
+        - featured
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        customerName:
+          type: string
+        rating:
+          type: integer
+        comment:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - customerName
+        - rating
+        - comment
+        - createdAt
+    GalleryImage:
+      type: object
+      properties:
+        id:
+          type: integer
+        imageUrl:
+          type: string
+        caption:
+          type: string
+        category:
+          type: string
+      required:
+        - id
+        - imageUrl
+        - caption
+        - category
+    StoreStats:
+      type: object
+      properties:
+        totalProducts:
+          type: integer
+        happyCustomers:
+          type: integer
+        yearsOfFarming:
+          type: integer
+        citiesDelivered:
+          type: integer
+      required:
+        - totalProducts
+        - happyCustomers
+        - yearsOfFarming
+        - citiesDelivered
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+        - message
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+        - message
