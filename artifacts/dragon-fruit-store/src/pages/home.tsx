@@ -62,7 +62,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
       {/* 1. Hero Section */}
       <section id="home" className="relative h-[100dvh] min-h-[650px] flex items-center justify-center pt-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -130,13 +129,12 @@ export default function Home() {
             transition={{ duration: 1, delay: 1 }}
             className="flex flex-wrap justify-center gap-8 mt-20 text-sm md:text-base font-medium text-zinc-200"
           >
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-secondary" /> 100% Natural</div>
+            <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> 100% Natural</div>
             <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-secondary" /> Farm-to-home</div>
             <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-secondary" /> Secure COD</div>
           </motion.div>
         </div>
       </section>
-
       {/* 2. Why Choose Us */}
       <section className="py-24 bg-zinc-50 dark:bg-zinc-900/40 relative">
         <div className="container px-4 md:px-6 mx-auto">
@@ -174,7 +172,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* 3. Products Section */}
       <section id="products" className="py-24 md:py-32 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-900">
         <div className="container px-4 md:px-6 mx-auto">
@@ -329,7 +326,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
       {/* 4. Seasonal Offer Banner */}
       <section className="py-20 md:py-24 bg-gradient-to-br from-primary via-rose-600 to-primary relative overflow-hidden">
         {/* Decorative background elements */}
@@ -358,7 +354,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
       {/* 5. About the Farm */}
       <section id="about" className="py-24 md:py-32 bg-zinc-50 dark:bg-zinc-900/30 overflow-hidden relative">
         <div className="container px-4 md:px-6 mx-auto">
@@ -447,7 +442,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       {/* 6. Reviews Slider */}
       <section className="py-24 md:py-32 bg-white dark:bg-zinc-950 overflow-hidden">
         <div className="container px-4 md:px-6 mx-auto relative">
@@ -515,7 +509,6 @@ export default function Home() {
           )}
         </div>
       </section>
-
       {/* 7. Gallery Section */}
       <section id="gallery" className="py-24 md:py-32 bg-zinc-50 dark:bg-zinc-900/30">
         <div className="container px-4 md:px-6 mx-auto">
@@ -574,7 +567,6 @@ export default function Home() {
           </Dialog>
         </div>
       </section>
-
       {/* 8. Contact Section */}
       <section id="contact" className="py-24 md:py-32 bg-white dark:bg-zinc-950">
         <div className="container px-4 md:px-6 mx-auto">
@@ -646,7 +638,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   );
