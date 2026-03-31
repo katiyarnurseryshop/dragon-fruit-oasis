@@ -21,6 +21,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Link } from "wouter";
+import { useCart } from "@/context/cart-context";
 import { 
   Leaf, 
   Truck, 
@@ -35,6 +36,7 @@ import {
   X,
   MessageCircle,
   ArrowRight,
+  ShoppingCart,
 } from "lucide-react";
 
 export default function Home() {
@@ -42,6 +44,7 @@ export default function Home() {
   const { data: reviews, isLoading: isLoadingReviews } = useGetReviews();
   const { data: gallery, isLoading: isLoadingGallery } = useGetGallery();
   const { data: stats } = useGetStoreStats();
+  const { addItem } = useCart();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -232,15 +235,32 @@ export default function Home() {
                         <span className="text-base font-normal text-muted-foreground font-sans"> / {product.unit}</span>
                       </span>
                     </div>
-                    <a href={getWhatsAppUrl(product.name)} target="_blank" rel="noopener noreferrer" className="w-full">
-                      <Button 
-                        className="w-full bg-secondary hover:bg-secondary/90 text-white font-bold h-14 rounded-full shadow-lg shadow-secondary/20"
+                    <div className="flex gap-3">
+                      <Button
+                        className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 rounded-full shadow-lg"
                         disabled={!product.inStock}
+                        onClick={() => addItem({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          unit: product.unit,
+                          imageUrl: product.imageUrl,
+                        })}
                       >
-                        <MessageCircle className="w-5 h-5 mr-2" />
-                        Order on WhatsApp
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Add to Cart
                       </Button>
-                    </a>
+                      <a href={getWhatsAppUrl(product.name)} target="_blank" rel="noopener noreferrer">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-12 w-12 rounded-full border-secondary text-secondary hover:bg-secondary hover:text-white shrink-0"
+                          disabled={!product.inStock}
+                        >
+                          <MessageCircle className="w-5 h-5" />
+                        </Button>
+                      </a>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>

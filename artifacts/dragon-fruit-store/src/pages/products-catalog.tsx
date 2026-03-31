@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { useCart } from "@/context/cart-context";
 import {
   Search,
   Leaf,
@@ -20,6 +21,7 @@ import {
   ChevronRight,
   Star,
   ArrowRight,
+  ShoppingCart,
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 12;
@@ -28,6 +30,7 @@ const FILTER_OPTIONS = ["All", "Featured", "Under ₹200", "₹200–₹500", "A
 export default function ProductsCatalog() {
   const { data: products, isLoading } = useGetProducts();
   const { data: stats } = useGetStoreStats();
+  const { addItem } = useCart();
   const [, setLocation] = useLocation();
 
   const [search, setSearch] = useState("");
@@ -260,7 +263,7 @@ export default function ProductsCatalog() {
                     <p className="text-muted-foreground text-xs mb-4 line-clamp-2 flex-1 leading-relaxed">
                       {product.description}
                     </p>
-                    <div className="flex items-center justify-between mt-auto">
+                    <div className="flex items-center justify-between mt-auto mb-3">
                       <div>
                         <span className="font-heading font-bold text-2xl text-primary">
                           ₹{product.price}
@@ -271,6 +274,23 @@ export default function ProductsCatalog() {
                         <CheckCircle2 className="w-3 h-3" /> In Stock
                       </span>
                     </div>
+                    <Button
+                      className="w-full rounded-full h-9 text-sm font-semibold gap-2"
+                      disabled={!product.inStock}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addItem({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          unit: product.unit,
+                          imageUrl: product.imageUrl,
+                        });
+                      }}
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      Add to Cart
+                    </Button>
                   </div>
                 </motion.div>
               ))}

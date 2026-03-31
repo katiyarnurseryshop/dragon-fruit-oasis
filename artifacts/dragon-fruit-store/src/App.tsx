@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CartProvider } from "@/context/cart-context";
+import { CartDrawer } from "@/components/cart-drawer";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Admin from "@/pages/admin";
@@ -34,12 +36,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+            <CartDrawer />
+            <Toaster />
+          </TooltipProvider>
+        </CartProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

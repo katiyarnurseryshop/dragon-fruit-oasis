@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, X, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/cart-context";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
+  const { openCart, totalCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location] = useLocation();
@@ -95,18 +97,22 @@ export function Navbar() {
             <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
-          <Link href="/products">
-            <Button
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-full px-5"
-              data-testid="button-nav-catalog"
-            >
-              Browse Plants
-            </Button>
-          </Link>
+          <button
+            onClick={openCart}
+            className={`relative p-2 rounded-full transition-colors ${transparent ? "text-white hover:bg-white/20" : "hover:bg-muted"}`}
+            aria-label="Open cart"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {totalCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                {totalCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Mobile Toggle */}
-        <div className="md:hidden flex items-center gap-2 z-50">
+        <div className="md:hidden flex items-center gap-1 z-50">
           <Button
             variant="ghost"
             size="icon"
@@ -116,6 +122,18 @@ export function Navbar() {
             <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           </Button>
+          <button
+            onClick={openCart}
+            className={`relative p-2 rounded-full transition-colors ${transparent && !mobileMenuOpen ? "text-white hover:bg-white/20" : "hover:bg-muted text-foreground"}`}
+            aria-label="Open cart"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            {totalCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                {totalCount}
+              </span>
+            )}
+          </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className={`p-2 rounded-md ${transparent && !mobileMenuOpen ? "text-white" : "text-foreground"}`}
@@ -146,13 +164,6 @@ export function Navbar() {
                   {link.name}
                 </a>
               ))}
-              <div className="mt-4 px-4">
-                <Link href="/products" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg h-14 rounded-full">
-                    Browse Plants
-                  </Button>
-                </Link>
-              </div>
               <Link
                 href="/admin"
                 className="text-muted-foreground mt-8 text-sm hover:text-primary transition-colors"
