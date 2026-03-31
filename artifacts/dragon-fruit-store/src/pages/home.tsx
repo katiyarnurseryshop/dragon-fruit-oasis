@@ -131,7 +131,7 @@ export default function Home() {
           >
             <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> 100% Natural</div>
             <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> Farm-to-home</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-secondary" /> Secure COD</div>
+            <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> Secure COD</div>
           </motion.div>
         </div>
       </section>
