@@ -130,7 +130,7 @@ export default function Home() {
             className="flex flex-wrap justify-center gap-8 mt-20 text-sm md:text-base font-medium text-zinc-200"
           >
             <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> 100% Natural</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-secondary" /> Farm-to-home</div>
+            <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> Farm-to-home</div>
             <div className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-secondary" /> Secure COD</div>
           </motion.div>
         </div>
