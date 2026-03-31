@@ -40,7 +40,133 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit, Plus, Trash2, Loader2, LeafyGreen } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Trash2, Loader2, LeafyGreen, Lock, User, Eye, EyeOff, LogOut, ShieldCheck } from "lucide-react";
+
+const ADMIN_USER = "Katiyarnursery_2026";
+const ADMIN_PASS = "katiyar@6172";
+const AUTH_KEY = "kn_admin_auth";
+
+function AdminLogin({ onLogin }: { onLogin: () => void }) {
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    setTimeout(() => {
+      if (userId === ADMIN_USER && password === ADMIN_PASS) {
+        localStorage.setItem(AUTH_KEY, "true");
+        onLogin();
+      } else {
+        setError("Invalid User ID or Password. Please try again.");
+      }
+      setLoading(false);
+    }, 600);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <img src="/logo.png" alt="Katiyar Nursery" className="w-20 h-20 rounded-full shadow-xl object-cover ring-4 ring-white dark:ring-zinc-800" />
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-primary rounded-full flex items-center justify-center shadow-md">
+                <ShieldCheck className="w-4 h-4 text-white" />
+              </div>
+            </div>
+          </div>
+          <h1 className="font-heading font-bold text-3xl text-foreground mb-1">Admin Login</h1>
+          <p className="text-muted-foreground text-sm">Katiyar Nursery — Secure Admin Panel</p>
+        </div>
+
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200/50 dark:border-zinc-800 p-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-foreground">User ID</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Enter your User ID"
+                  className="pl-10 h-12 rounded-xl border-zinc-200 dark:border-zinc-700 focus:border-primary"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  autoComplete="username"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-foreground">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type={showPass ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className="pl-10 pr-10 h-12 rounded-xl border-zinc-200 dark:border-zinc-700 focus:border-primary"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div className="bg-destructive/10 text-destructive text-sm px-4 py-3 rounded-xl border border-destructive/20 flex items-center gap-2">
+                <Lock className="w-4 h-4 shrink-0" />
+                {error}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 rounded-xl font-semibold text-base bg-primary hover:bg-primary/90 mt-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-4 h-4 mr-2" />
+                  Login to Admin Panel
+                </>
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-6 pt-5 border-t border-zinc-100 dark:border-zinc-800 text-center">
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                ← Back to Store
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          © {new Date().getFullYear()} Katiyar Nursery, Kanpur. Secure admin access only.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 const productSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -60,9 +186,9 @@ export default function Admin() {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => localStorage.getItem(AUTH_KEY) === "true");
 
   const { data: products, isLoading } = useGetProducts();
-  
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
@@ -80,6 +206,15 @@ export default function Admin() {
       featured: false,
     },
   });
+
+  const handleLogout = () => {
+    localStorage.removeItem(AUTH_KEY);
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLogin={() => setIsAuthenticated(true)} />;
+  }
 
   const openNewForm = () => {
     form.reset({
@@ -166,13 +301,19 @@ export default function Admin() {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             </Link>
-            <div>
-              <h1 className="text-3xl font-bold font-heading flex items-center gap-2">
-                Store Admin
-              </h1>
-              <p className="text-muted-foreground">Manage your products inventory</p>
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="Katiyar Nursery" className="w-10 h-10 rounded-full object-cover shadow-sm hidden sm:block" />
+              <div>
+                <h1 className="text-3xl font-bold font-heading">Store Admin</h1>
+                <p className="text-muted-foreground text-sm">Logged in as <span className="font-semibold text-primary">{ADMIN_USER}</span></p>
+              </div>
             </div>
           </div>
+          <div className="flex items-center gap-3 ml-auto sm:ml-0">
+            <Button variant="outline" size="sm" onClick={handleLogout} className="rounded-full gap-2 text-muted-foreground hover:text-destructive hover:border-destructive">
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
           
           <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
