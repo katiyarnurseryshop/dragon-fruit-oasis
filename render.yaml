@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: dragon-fruit-oasis-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter @workspace/api-server build
+    startCommand: corepack pnpm --filter @workspace/api-server start
+    healthCheckPath: /api/healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: PORT
+        value: 3000

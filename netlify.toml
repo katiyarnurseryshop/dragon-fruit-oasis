@@ -1,0 +1,9 @@
+[build]
+  base = "."
+  command = "corepack pnpm --filter @workspace/dragon-fruit-store build"
+  publish = "frontened/dragon-fruit-store/dist/public"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

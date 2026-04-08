@@ -1,0 +1,17 @@
+import { defineConfig } from "drizzle-kit";
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL, ensure the database is provisioned");
+}
+
+export default defineConfig({
+  schema: [
+    "./src/schema/products.ts",
+    "./src/schema/reviews.ts",
+    "./src/schema/gallery.ts",
+  ],
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL,
+  },
+});
