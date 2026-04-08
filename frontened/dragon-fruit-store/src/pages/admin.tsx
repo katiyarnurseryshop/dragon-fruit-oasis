@@ -43,10 +43,11 @@ import {
   useDeliveryChargeRules,
 } from "@/lib/order-pricing";
 
-const ADMIN_SESSION_URL = "/api/admin/session";
-const ADMIN_CHANGE_PASSWORD_URL = "/api/admin/change-password";
-const ADMIN_DASHBOARD_URL = "/api/admin/dashboard";
-const PRODUCT_IMAGE_UPLOAD_URL = "/api/products/upload";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
+const ADMIN_SESSION_URL = `${API_BASE_URL}/api/admin/session`;
+const ADMIN_CHANGE_PASSWORD_URL = `${API_BASE_URL}/api/admin/change-password`;
+const ADMIN_DASHBOARD_URL = `${API_BASE_URL}/api/admin/dashboard`;
+const PRODUCT_IMAGE_UPLOAD_URL = `${API_BASE_URL}/api/products/upload`;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
 
 const loginSchema = z.object({
