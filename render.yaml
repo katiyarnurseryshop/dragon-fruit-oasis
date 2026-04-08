@@ -8,6 +8,8 @@ services:
     startCommand: corepack pnpm --filter @workspace/api-server start
     healthCheckPath: /api/healthz
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: NODE_VERSION
         value: 22
       - key: DATABASE_URL
