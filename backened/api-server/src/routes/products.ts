@@ -17,6 +17,14 @@ function parseProductId(rawId: string | string[]) {
   return Number.parseInt(Array.isArray(rawId) ? rawId[0] ?? "" : rawId, 10);
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
 router.get("/products", async (req, res) => {
   if (!db) {
     res.json(getMockProducts());
@@ -76,7 +84,10 @@ router.post("/products", requireAdmin, async (req, res) => {
     res.status(201).json({ ...product, price: parseFloat(product.price), badge: product.badge ?? null });
   } catch (err) {
     req.log.error({ err }, "Failed to create product");
-    res.status(500).json({ error: "server_error", message: "Failed to create product" });
+    res.status(500).json({
+      error: "server_error",
+      message: getErrorMessage(err, "Failed to create product"),
+    });
   }
 });
 
@@ -199,7 +210,10 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
     res.json({ ...product, price: parseFloat(product.price), badge: product.badge ?? null });
   } catch (err) {
     req.log.error({ err }, "Failed to update product");
-    res.status(500).json({ error: "server_error", message: "Failed to update product" });
+    res.status(500).json({
+      error: "server_error",
+      message: getErrorMessage(err, "Failed to update product"),
+    });
   }
 });
 
@@ -229,7 +243,10 @@ router.delete("/products/:id", requireAdmin, async (req, res) => {
     res.json({ success: true, message: "Product deleted" });
   } catch (err) {
     req.log.error({ err }, "Failed to delete product");
-    res.status(500).json({ error: "server_error", message: "Failed to delete product" });
+    res.status(500).json({
+      error: "server_error",
+      message: getErrorMessage(err, "Failed to delete product"),
+    });
   }
 });
 
