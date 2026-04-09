@@ -135,7 +135,7 @@ export function OrderFormDialog({
                       <div key={item.id} className="rounded-2xl bg-black/15 p-3">
                         <div className="flex items-start gap-3">
                           <img
-                            src={item.imageUrl}
+                          src={resolveAssetUrl(item.imageUrl)}
                             alt={item.name}
                             className="h-14 w-14 rounded-xl object-cover"
                           />
@@ -278,3 +278,4 @@ export function OrderFormDialog({
     </Dialog>
   );
 }
+import { resolveAssetUrl } from "@/lib/asset-url";

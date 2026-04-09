@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SITE_CONTACT } from "@/lib/site-contact";
+import { resolveAssetUrl } from "@/lib/asset-url";
 import { useCart } from "@/context/cart-context";
 import { OrderFormDialog } from "@/components/order-form-dialog";
 import { OrderLineItem } from "@/lib/order-pricing";
@@ -137,7 +138,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
           >
             <div className="rounded-2xl overflow-hidden bg-muted aspect-square shadow-xl">
               <img
-                src={product.imageUrl}
+                src={resolveAssetUrl(product.imageUrl)}
                 alt={product.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -344,7 +345,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                 >
                   <div className="h-36 overflow-hidden bg-muted">
                     <img
-                      src={p.imageUrl}
+                      src={resolveAssetUrl(p.imageUrl)}
                       alt={p.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {

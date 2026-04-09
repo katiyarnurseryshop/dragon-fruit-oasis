@@ -81,7 +81,7 @@ export function CartDrawer() {
                       className="flex gap-3 rounded-xl bg-muted/40 p-3"
                     >
                       <img
-                        src={item.imageUrl}
+                    src={resolveAssetUrl(item.imageUrl)}
                         alt={item.name}
                         className="h-16 w-16 shrink-0 rounded-lg object-cover"
                         onError={(e) => {
@@ -185,3 +185,4 @@ export function CartDrawer() {
     </>
   );
 }
+import { resolveAssetUrl } from "@/lib/asset-url";

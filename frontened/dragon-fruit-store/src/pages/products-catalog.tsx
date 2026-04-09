@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/cart-context";
 import { SITE_CONTACT } from "@/lib/site-contact";
+import { resolveAssetUrl } from "@/lib/asset-url";
 import { OrderFormDialog } from "@/components/order-form-dialog";
 import { OrderLineItem } from "@/lib/order-pricing";
 import {
@@ -264,7 +265,7 @@ export default function ProductsCatalog() {
                   {/* Image */}
                   <div className="relative h-52 overflow-hidden bg-muted shrink-0">
                     <img
-                      src={product.imageUrl}
+                      src={resolveAssetUrl(product.imageUrl)}
                       alt={product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       onError={(e) => {

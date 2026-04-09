@@ -42,6 +42,7 @@ import {
   saveDeliveryChargeRules,
   useDeliveryChargeRules,
 } from "@/lib/order-pricing";
+import { resolveAssetUrl } from "@/lib/asset-url";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
 const ADMIN_SESSION_URL = `${API_BASE_URL}/api/admin/session`;
@@ -895,7 +896,7 @@ export default function Admin() {
                       >
                         <div className="flex items-center gap-3">
                           <img
-                            src={product.imageUrl}
+                    src={resolveAssetUrl(product.imageUrl)}
                             alt={product.name}
                             className="h-14 w-14 rounded-[18px] object-cover ring-1 ring-black/10 dark:ring-white/10"
                             onError={(e) => { (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE; }}
@@ -1038,7 +1039,7 @@ export default function Admin() {
                   <div className="rounded-[24px] border border-[#8e2248]/15 bg-[linear-gradient(180deg,#fff7fa_0%,#fffef9_46%,#f5fff8_100%)] p-3 dark:border-white/10 dark:bg-[linear-gradient(180deg,#23151b_0%,#171214_60%,#121715_100%)]">
                     <div className="overflow-hidden rounded-[20px] border border-black/10 bg-white/80 dark:border-white/10 dark:bg-white/5">
                       <img
-                        src={productForm.watch("imageUrl") || PRODUCT_FALLBACK_IMAGE}
+                src={resolveAssetUrl(productForm.watch("imageUrl")) || PRODUCT_FALLBACK_IMAGE}
                         alt="Product preview"
                         className="h-44 w-full object-cover"
                         onError={(e) => {
@@ -1228,7 +1229,7 @@ export default function Admin() {
                       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                         <div className="flex gap-3">
                           <img
-                            src={product.imageUrl}
+                            src={resolveAssetUrl(product.imageUrl)}
                             alt={product.name}
                             className="h-22 w-22 rounded-[20px] object-cover ring-1 ring-black/10 dark:ring-white/10"
                             onError={(e) => { (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE; }}
