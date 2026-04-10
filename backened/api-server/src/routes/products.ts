@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, productsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import {
   createMockProduct,
   deleteMockProduct,
@@ -41,6 +41,111 @@ function getErrorMessage(error: unknown, fallback: string) {
   }
 
   return fallback;
+}
+
+function looksLikeLegacyImageUrlConstraint(error: unknown) {
+  const message = getErrorMessage(error, "").toLowerCase();
+
+  return message.includes("image_url") || message.includes("products_image_url");
+}
+
+async function insertProductWithLegacyImageUrl(values: {
+  name: string;
+  description: string;
+  price: string;
+  unit: string;
+  imageUrl1: string;
+  imageUrl2: string | null;
+  imageUrl3: string | null;
+  imageUrl4: string | null;
+  imageUrl5: string | null;
+  badge: string | null;
+  inStock: boolean;
+  featured: boolean;
+}) {
+  if (!db) {
+    throw new Error("Database unavailable");
+  }
+
+  const result = await db.execute(sql`
+    insert into "products" (
+      "name",
+      "description",
+      "price",
+      "unit",
+      "image_url",
+      "image_url_1",
+      "image_url_2",
+      "image_url_3",
+      "image_url_4",
+      "image_url_5",
+      "badge",
+      "in_stock",
+      "featured"
+    )
+    values (
+      ${values.name},
+      ${values.description},
+      ${values.price},
+      ${values.unit},
+      ${values.imageUrl1},
+      ${values.imageUrl1},
+      ${values.imageUrl2},
+      ${values.imageUrl3},
+      ${values.imageUrl4},
+      ${values.imageUrl5},
+      ${values.badge},
+      ${values.inStock},
+      ${values.featured}
+    )
+    returning *
+  `);
+
+  return result.rows[0] as Record<string, unknown>;
+}
+
+async function updateProductWithLegacyImageUrl(
+  id: number,
+  values: {
+    name: string;
+    description: string;
+    price: string;
+    unit: string;
+    imageUrl1: string;
+    imageUrl2: string | null;
+    imageUrl3: string | null;
+    imageUrl4: string | null;
+    imageUrl5: string | null;
+    badge: string | null;
+    inStock: boolean;
+    featured: boolean;
+  },
+) {
+  if (!db) {
+    throw new Error("Database unavailable");
+  }
+
+  const result = await db.execute(sql`
+    update "products"
+    set
+      "name" = ${values.name},
+      "description" = ${values.description},
+      "price" = ${values.price},
+      "unit" = ${values.unit},
+      "image_url" = ${values.imageUrl1},
+      "image_url_1" = ${values.imageUrl1},
+      "image_url_2" = ${values.imageUrl2},
+      "image_url_3" = ${values.imageUrl3},
+      "image_url_4" = ${values.imageUrl4},
+      "image_url_5" = ${values.imageUrl5},
+      "badge" = ${values.badge},
+      "in_stock" = ${values.inStock},
+      "featured" = ${values.featured}
+    where "id" = ${id}
+    returning *
+  `);
+
+  return result.rows[0] as Record<string, unknown> | undefined;
 }
 
 router.get("/products", async (req, res) => {
@@ -111,26 +216,37 @@ router.post("/products", requireAdmin, async (req, res) => {
       return;
     }
 
-    const [product] = await db
-      .insert(productsTable)
-      .values({
-        name,
-        description,
-        price: String(price),
-        unit: unit || "Kg",
-        imageUrl1: primaryImageUrl,
-        imageUrl2: imageUrl2 || null,
-        imageUrl3: imageUrl3 || null,
-        imageUrl4: imageUrl4 || null,
-        imageUrl5: imageUrl5 || null,
-        badge: badge || null,
-        inStock: inStock ?? true,
-        featured: featured ?? false,
-      })
-      .returning();
+    const dbValues = {
+      name,
+      description,
+      price: String(price),
+      unit: unit || "Kg",
+      imageUrl1: primaryImageUrl,
+      imageUrl2: imageUrl2 || null,
+      imageUrl3: imageUrl3 || null,
+      imageUrl4: imageUrl4 || null,
+      imageUrl5: imageUrl5 || null,
+      badge: badge || null,
+      inStock: inStock ?? true,
+      featured: featured ?? false,
+    };
+
+    let product: Record<string, unknown>;
+
+    try {
+      [product] = await db.insert(productsTable).values(dbValues).returning();
+    } catch (error) {
+      if (!looksLikeLegacyImageUrlConstraint(error)) {
+        throw error;
+      }
+
+      req.log.warn({ err: error }, "Retrying product insert with legacy image_url compatibility");
+      product = await insertProductWithLegacyImageUrl(dbValues);
+    }
+
     res.status(201).json({
       ...normalizeProductResponse(product),
-      price: parseFloat(product.price),
+      price: parseFloat(String(product.price)),
       badge: product.badge ?? null,
     });
   } catch (err) {
@@ -268,31 +384,49 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
       return;
     }
 
-    const [product] = await db
-      .update(productsTable)
-      .set({
-        name,
-        description,
-        price: String(price),
-        unit,
-        imageUrl1: primaryImageUrl,
-        imageUrl2: imageUrl2 || null,
-        imageUrl3: imageUrl3 || null,
-        imageUrl4: imageUrl4 || null,
-        imageUrl5: imageUrl5 || null,
-        badge: badge || null,
-        inStock,
-        featured,
-      })
-      .where(eq(productsTable.id, id))
-      .returning();
+    const dbValues = {
+      name,
+      description,
+      price: String(price),
+      unit,
+      imageUrl1: primaryImageUrl,
+      imageUrl2: imageUrl2 || null,
+      imageUrl3: imageUrl3 || null,
+      imageUrl4: imageUrl4 || null,
+      imageUrl5: imageUrl5 || null,
+      badge: badge || null,
+      inStock,
+      featured,
+    };
+
+    let product: Record<string, unknown> | undefined;
+
+    try {
+      [product] = await db
+        .update(productsTable)
+        .set(dbValues)
+        .where(eq(productsTable.id, id))
+        .returning();
+    } catch (error) {
+      if (!looksLikeLegacyImageUrlConstraint(error)) {
+        throw error;
+      }
+
+      req.log.warn({ err: error }, "Retrying product update with legacy image_url compatibility");
+      product = await updateProductWithLegacyImageUrl(id, {
+        ...dbValues,
+        inStock: inStock ?? true,
+        featured: featured ?? false,
+      });
+    }
+
     if (!product) {
       res.status(404).json({ error: "not_found", message: "Product not found" });
       return;
     }
     res.json({
       ...normalizeProductResponse(product),
-      price: parseFloat(product.price),
+      price: parseFloat(String(product.price)),
       badge: product.badge ?? null,
     });
   } catch (err) {
