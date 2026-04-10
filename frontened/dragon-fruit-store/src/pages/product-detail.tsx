@@ -14,6 +14,7 @@ import { OrderFormDialog } from "@/components/order-form-dialog";
 import { OrderLineItem } from "@/lib/order-pricing";
 import {
   ArrowLeft,
+  ChevronLeft,
   MessageCircle,
   Leaf,
   ShieldCheck,
@@ -119,6 +120,14 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     setIsOrderFormOpen(true);
   };
 
+  const showPreviousImage = () => {
+    setActiveImageIndex((current) => (current === 0 ? productImages.length - 1 : current - 1));
+  };
+
+  const showNextImage = () => {
+    setActiveImageIndex((current) => (current === productImages.length - 1 ? 0 : current + 1));
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -152,7 +161,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="rounded-2xl overflow-hidden bg-muted aspect-square shadow-xl">
+            <div className="relative rounded-2xl overflow-hidden bg-muted aspect-square shadow-xl">
               <img
                 src={resolveAssetUrl(productImages[activeImageIndex] ?? product.imageUrl)}
                 alt={product.name}
@@ -161,56 +170,77 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                   (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE;
                 }}
               />
+
+              <div className="absolute top-4 left-4 flex flex-col gap-2">
+                {product.badge && (
+                  <Badge className="bg-primary text-primary-foreground font-semibold px-3 py-1.5 rounded-full shadow-lg text-sm">
+                    {product.badge}
+                  </Badge>
+                )}
+                {product.featured && (
+                  <Badge className="bg-yellow-400 text-yellow-900 font-semibold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 text-sm">
+                    <Star className="w-3.5 h-3.5 fill-yellow-900" /> Featured
+                  </Badge>
+                )}
+              </div>
+
+              <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-[280px] bg-white/92 dark:bg-zinc-900/90 backdrop-blur rounded-2xl px-4 py-3 shadow-lg flex items-center gap-3">
+                <img src="/logo.png" alt="Katiyar Nursery" className="w-8 h-8 rounded-full" />
+                <div className="min-w-0 text-xs leading-tight">
+                  <p className="font-semibold text-foreground">Katiyar Nursery</p>
+                  <p className="truncate text-muted-foreground">{SITE_CONTACT.locationLabel}</p>
+                </div>
+              </div>
+
+              {productImages.length > 1 ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={showPreviousImage}
+                    className="absolute left-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-foreground shadow-lg backdrop-blur transition hover:bg-white"
+                    aria-label="Show previous image"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={showNextImage}
+                    className="absolute right-4 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-foreground shadow-lg backdrop-blur transition hover:bg-white"
+                    aria-label="Show next image"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              ) : null}
             </div>
 
             {productImages.length > 1 ? (
-              <div className="mt-4 grid grid-cols-5 gap-3">
-                {productImages.map((imageUrl, index) => (
-                  <button
-                    key={`${imageUrl}-${index}`}
-                    type="button"
-                    onClick={() => setActiveImageIndex(index)}
-                    className={`overflow-hidden rounded-xl border transition ${
-                      activeImageIndex === index
-                        ? "border-primary shadow-md"
-                        : "border-border hover:border-primary/40"
-                    }`}
-                  >
-                    <img
-                      src={resolveAssetUrl(imageUrl)}
-                      alt={`${product.name} view ${index + 1}`}
-                      className="h-18 w-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE;
-                      }}
-                    />
-                  </button>
-                ))}
+              <div className="mt-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex min-w-max gap-3">
+                  {productImages.map((imageUrl, index) => (
+                    <button
+                      key={`${imageUrl}-${index}`}
+                      type="button"
+                      onClick={() => setActiveImageIndex(index)}
+                      className={`w-28 shrink-0 overflow-hidden rounded-xl border transition ${
+                        activeImageIndex === index
+                          ? "border-primary shadow-md"
+                          : "border-border hover:border-primary/40"
+                      }`}
+                    >
+                      <img
+                        src={resolveAssetUrl(imageUrl)}
+                        alt={`${product.name} view ${index + 1}`}
+                        className="h-20 w-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE;
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
-
-            {/* Badges overlay */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2">
-              {product.badge && (
-                <Badge className="bg-primary text-primary-foreground font-semibold px-3 py-1.5 rounded-full shadow-lg text-sm">
-                  {product.badge}
-                </Badge>
-              )}
-              {product.featured && (
-                <Badge className="bg-yellow-400 text-yellow-900 font-semibold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 text-sm">
-                  <Star className="w-3.5 h-3.5 fill-yellow-900" /> Featured
-                </Badge>
-              )}
-            </div>
-
-            {/* Farm badge */}
-            <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-zinc-900/90 backdrop-blur rounded-xl px-4 py-2 shadow-lg flex items-center gap-2">
-              <img src="/logo.png" alt="Katiyar Nursery" className="w-8 h-8 rounded-full" />
-              <div className="text-xs leading-tight">
-                <p className="font-semibold text-foreground">Katiyar Nursery</p>
-                <p className="text-muted-foreground">{SITE_CONTACT.locationLabel}</p>
-              </div>
-            </div>
           </motion.div>
 
           {/* Details */}
