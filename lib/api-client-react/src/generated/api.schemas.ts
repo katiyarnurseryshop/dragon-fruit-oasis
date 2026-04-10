@@ -16,6 +16,11 @@ export interface Product {
   price: number;
   unit: string;
   imageUrl: string;
+  imageUrl1?: string;
+  imageUrl2?: string | null;
+  imageUrl3?: string | null;
+  imageUrl4?: string | null;
+  imageUrl5?: string | null;
   badge?: string | null;
   inStock: boolean;
   featured: boolean;
@@ -27,7 +32,11 @@ export interface CreateProduct {
   description: string;
   price: number;
   unit: string;
-  imageUrl: string;
+  imageUrl1: string;
+  imageUrl2?: string | null;
+  imageUrl3?: string | null;
+  imageUrl4?: string | null;
+  imageUrl5?: string | null;
   badge?: string | null;
   inStock: boolean;
   featured: boolean;

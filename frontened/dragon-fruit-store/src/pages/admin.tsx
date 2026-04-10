@@ -50,6 +50,13 @@ const ADMIN_CHANGE_PASSWORD_URL = `${API_BASE_URL}/api/admin/change-password`;
 const ADMIN_DASHBOARD_URL = `${API_BASE_URL}/api/admin/dashboard`;
 const PRODUCT_IMAGE_UPLOAD_URL = `${API_BASE_URL}/api/products/upload`;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+const PRODUCT_IMAGE_FIELDS = [
+  "imageUrl1",
+  "imageUrl2",
+  "imageUrl3",
+  "imageUrl4",
+  "imageUrl5",
+] as const;
 
 const loginSchema = z.object({
   username: z.string().min(1, "User ID is required"),
@@ -72,7 +79,11 @@ const productSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   price: z.coerce.number().min(1, "Price must be greater than 0"),
   unit: z.string().min(1, "Unit is required"),
-  imageUrl: z.string().min(1, "Image URL is required"),
+  imageUrl1: z.string().min(1, "Primary image URL is required"),
+  imageUrl2: z.string().optional(),
+  imageUrl3: z.string().optional(),
+  imageUrl4: z.string().optional(),
+  imageUrl5: z.string().optional(),
   badge: z.string().optional(),
   inStock: z.boolean(),
   featured: z.boolean(),
@@ -96,6 +107,13 @@ interface AdminDashboardData {
 }
 
 const PRODUCT_FALLBACK_IMAGE = "/images/gallery-1.png";
+
+function getProductImageList(product?: Partial<ProductValues & Product> | null) {
+  if (!product) return [];
+
+  return PRODUCT_IMAGE_FIELDS.map((field) => product[field])
+    .filter((value): value is string => typeof value === "string" && value.trim().length > 0);
+}
 
 function formatAdminDisplayName(username?: string) {
   if (!username) return "Katiyar Nursery";
@@ -372,8 +390,8 @@ export default function Admin() {
   const [dashboardData, setDashboardData] = useState<AdminDashboardData | null>(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [deliveryDraft, setDeliveryDraft] = useState<DeliveryChargeRule[]>(DEFAULT_DELIVERY_CHARGE_RULES);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [uploadedImageName, setUploadedImageName] = useState("");
+  const [uploadingImageField, setUploadingImageField] = useState<(typeof PRODUCT_IMAGE_FIELDS)[number] | null>(null);
+  const [uploadedImageNames, setUploadedImageNames] = useState<Record<string, string>>({});
 
   const { data: products = [], isLoading: productsLoading } = useGetProducts();
   const createProduct = useCreateProduct();
@@ -388,7 +406,11 @@ export default function Admin() {
       description: "",
       price: 0,
       unit: "plant",
-      imageUrl: "",
+      imageUrl1: "",
+      imageUrl2: "",
+      imageUrl3: "",
+      imageUrl4: "",
+      imageUrl5: "",
       badge: "",
       inStock: true,
       featured: false,
@@ -421,6 +443,14 @@ export default function Admin() {
     () => formatAdminDisplayName(dashboardData?.username),
     [dashboardData?.username],
   );
+  const productImageValues = productForm.watch(PRODUCT_IMAGE_FIELDS);
+  const productPreviewImages = getProductImageList({
+    imageUrl1: productImageValues[0],
+    imageUrl2: productImageValues[1],
+    imageUrl3: productImageValues[2],
+    imageUrl4: productImageValues[3],
+    imageUrl5: productImageValues[4],
+  });
 
   useEffect(() => {
     setDeliveryDraft((current) => {
@@ -495,13 +525,17 @@ export default function Admin() {
 
   const resetProductForm = () => {
     setEditingProduct(null);
-    setUploadedImageName("");
+    setUploadedImageNames({});
     productForm.reset({
       name: "",
       description: "",
       price: 0,
       unit: "plant",
-      imageUrl: "",
+      imageUrl1: "",
+      imageUrl2: "",
+      imageUrl3: "",
+      imageUrl4: "",
+      imageUrl5: "",
       badge: "",
       inStock: true,
       featured: false,
@@ -511,20 +545,27 @@ export default function Admin() {
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setActiveSection("create");
-    setUploadedImageName("");
+    setUploadedImageNames({});
     productForm.reset({
       name: product.name,
       description: product.description,
       price: product.price,
       unit: product.unit,
-      imageUrl: product.imageUrl,
+      imageUrl1: product.imageUrl1 ?? product.imageUrl,
+      imageUrl2: product.imageUrl2 ?? "",
+      imageUrl3: product.imageUrl3 ?? "",
+      imageUrl4: product.imageUrl4 ?? "",
+      imageUrl5: product.imageUrl5 ?? "",
       badge: product.badge ?? "",
       inStock: product.inStock,
       featured: product.featured,
     });
   };
 
-  const handleProductImageSelection = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProductImageSelection = async (
+    field: (typeof PRODUCT_IMAGE_FIELDS)[number],
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -537,7 +578,7 @@ export default function Admin() {
       return;
     }
 
-    setIsUploadingImage(true);
+    setUploadingImageField(field);
     try {
       const dataUrl = await readFileAsDataUrl(file);
       const response = await fetch(PRODUCT_IMAGE_UPLOAD_URL, {
@@ -562,12 +603,12 @@ export default function Admin() {
       }
 
       const payload = (await response.json()) as { imageUrl: string };
-      productForm.setValue("imageUrl", payload.imageUrl, {
+      productForm.setValue(field, payload.imageUrl, {
         shouldDirty: true,
         shouldTouch: true,
         shouldValidate: true,
       });
-      setUploadedImageName(file.name);
+      setUploadedImageNames((current) => ({ ...current, [field]: file.name }));
       toast({
         title: "Image uploaded",
         description: editingProduct ? "Product image is ready to update." : "Product image is ready to save.",
@@ -578,7 +619,7 @@ export default function Admin() {
         description: error instanceof Error ? error.message : "Unable to upload image right now.",
       });
     } finally {
-      setIsUploadingImage(false);
+      setUploadingImageField(null);
       event.target.value = "";
     }
   };
@@ -586,6 +627,11 @@ export default function Admin() {
   const handleProductSubmit = (values: ProductValues) => {
     const payload = {
       ...values,
+      imageUrl1: values.imageUrl1.trim(),
+      imageUrl2: values.imageUrl2?.trim() || null,
+      imageUrl3: values.imageUrl3?.trim() || null,
+      imageUrl4: values.imageUrl4?.trim() || null,
+      imageUrl5: values.imageUrl5?.trim() || null,
       badge: values.badge?.trim() ? values.badge.trim() : null,
     };
 
@@ -1039,7 +1085,7 @@ export default function Admin() {
                   <div className="rounded-[24px] border border-[#8e2248]/15 bg-[linear-gradient(180deg,#fff7fa_0%,#fffef9_46%,#f5fff8_100%)] p-3 dark:border-white/10 dark:bg-[linear-gradient(180deg,#23151b_0%,#171214_60%,#121715_100%)]">
                     <div className="overflow-hidden rounded-[20px] border border-black/10 bg-white/80 dark:border-white/10 dark:bg-white/5">
                       <img
-                src={resolveAssetUrl(productForm.watch("imageUrl")) || PRODUCT_FALLBACK_IMAGE}
+                        src={resolveAssetUrl(productPreviewImages[0]) || PRODUCT_FALLBACK_IMAGE}
                         alt="Product preview"
                         className="h-44 w-full object-cover"
                         onError={(e) => {
@@ -1048,28 +1094,26 @@ export default function Admin() {
                       />
                     </div>
                     <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#8e2248] dark:text-[#f3a9c5]">
-                      Product Image
+                      Product Images
                     </p>
                     <p className="mt-1 text-xs leading-5 text-[#6d5560] dark:text-[#c8bac0]">
-                      Upload from your device or paste an image URL. The latest uploaded photo can be used while creating or editing a product.
+                      Add up to 5 product images. The first image is the main catalog image, and the rest appear in the detail page gallery.
                     </p>
-                    <label className="mt-3 flex cursor-pointer items-center justify-center rounded-full bg-[#8e2248] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#741a3c]">
-                      {isUploadingImage ? "Uploading..." : editingProduct ? "Replace Image" : "Upload Image"}
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                        onChange={handleProductImageSelection}
-                        className="hidden"
-                        disabled={isUploadingImage}
-                      />
-                    </label>
-                    <p className="mt-2 text-xs text-[#735a66] dark:text-[#c8bac0]">
-                      {uploadedImageName
-                        ? `Selected: ${uploadedImageName}`
-                        : editingProduct
-                          ? "Upload a new photo to replace the current product image."
-                          : "No local file uploaded yet."}
-                    </p>
+                    {productPreviewImages.length > 1 ? (
+                      <div className="mt-3 grid grid-cols-4 gap-2">
+                        {productPreviewImages.slice(0, 4).map((imageUrl, index) => (
+                          <img
+                            key={`${imageUrl}-${index}`}
+                            src={resolveAssetUrl(imageUrl)}
+                            alt={`Product preview ${index + 1}`}
+                            className="h-14 w-full rounded-xl object-cover ring-1 ring-black/10 dark:ring-white/10"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE;
+                            }}
+                          />
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="space-y-3">
@@ -1120,18 +1164,40 @@ export default function Admin() {
                   </div>
                 </div>
 
-                <div>
-                  <Input
-                    {...productForm.register("imageUrl")}
-                    placeholder="Image URL or uploaded image path"
-                    className="h-10 rounded-2xl border-2 border-black/15 bg-white dark:border-white/10 dark:bg-[#171415]"
-                  />
-                  {productForm.formState.errors.imageUrl && (
-                    <p className="mt-2 text-sm text-red-600">{productForm.formState.errors.imageUrl.message}</p>
-                  )}
-                  <p className="mt-2 text-xs text-[#705964] dark:text-[#c8bac0]">
-                    You can paste a direct image URL, or use the upload button to pick a photo from local storage.
-                  </p>
+                <div className="space-y-3">
+                  {PRODUCT_IMAGE_FIELDS.map((field, index) => (
+                    <div key={field} className="rounded-[20px] border border-black/10 bg-white/70 p-3 dark:border-white/10 dark:bg-white/5">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <Input
+                          {...productForm.register(field)}
+                          placeholder={`Image ${index + 1} URL${index === 0 ? " (required)" : " (optional)"}`}
+                          className="h-10 rounded-2xl border-2 border-black/15 bg-white dark:border-white/10 dark:bg-[#171415]"
+                        />
+                        <label className="inline-flex cursor-pointer items-center justify-center rounded-full bg-[#8e2248] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#741a3c]">
+                          {uploadingImageField === field ? "Uploading..." : `Upload ${index + 1}`}
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                            onChange={(event) => void handleProductImageSelection(field, event)}
+                            className="hidden"
+                            disabled={uploadingImageField !== null}
+                          />
+                        </label>
+                      </div>
+                      {productForm.formState.errors[field] ? (
+                        <p className="mt-2 text-sm text-red-600">
+                          {productForm.formState.errors[field]?.message as string}
+                        </p>
+                      ) : null}
+                      <p className="mt-2 text-xs text-[#705964] dark:text-[#c8bac0]">
+                        {uploadedImageNames[field]
+                          ? `Selected: ${uploadedImageNames[field]}`
+                          : index === 0
+                            ? "Primary image is required for home, catalog, and search cards."
+                            : "Optional gallery image for the product detail page."}
+                      </p>
+                    </div>
+                  ))}
                 </div>
 
                 <Input
@@ -1160,7 +1226,7 @@ export default function Admin() {
                 <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap sm:gap-3">
                   <Button
                     type="submit"
-                    disabled={createProduct.isPending || updateProduct.isPending || isUploadingImage}
+                    disabled={createProduct.isPending || updateProduct.isPending || uploadingImageField !== null}
                     className="rounded-full bg-[#8e2248] text-white hover:bg-[#741a3c]"
                   >
                     <Save className="mr-2 h-4 w-4" />

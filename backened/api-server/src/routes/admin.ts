@@ -19,6 +19,24 @@ import { getMockProducts } from "../lib/mock-store";
 
 const router: IRouter = Router();
 
+function normalizeProductResponse<T extends Record<string, unknown>>(product: T) {
+  const imageUrl1 = typeof product.imageUrl1 === "string" && product.imageUrl1.trim()
+    ? product.imageUrl1
+    : typeof product.imageUrl === "string" && product.imageUrl.trim()
+      ? product.imageUrl
+      : "";
+
+  return {
+    ...product,
+    imageUrl: imageUrl1,
+    imageUrl1,
+    imageUrl2: (product.imageUrl2 as string | null | undefined) ?? null,
+    imageUrl3: (product.imageUrl3 as string | null | undefined) ?? null,
+    imageUrl4: (product.imageUrl4 as string | null | undefined) ?? null,
+    imageUrl5: (product.imageUrl5 as string | null | undefined) ?? null,
+  };
+}
+
 router.get("/admin/session", (req, res) => {
   const token = getAdminSessionCookie(req);
   const session = getAdminSession(token);
@@ -44,7 +62,7 @@ router.get("/admin/dashboard", requireAdmin, async (req, res) => {
       ? getMockProducts()
       : (await db.select().from(productsTable).orderBy(desc(productsTable.createdAt))).map(
           (product) => ({
-            ...product,
+            ...normalizeProductResponse(product),
             price: Number(product.price),
             badge: product.badge ?? null,
           }),

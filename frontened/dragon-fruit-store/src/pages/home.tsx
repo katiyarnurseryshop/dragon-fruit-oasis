@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   useGetProducts, 
@@ -18,13 +18,14 @@ import { resolveAssetUrl } from "@/lib/asset-url";
 import { OrderFormDialog } from "@/components/order-form-dialog";
 import { OrderLineItem } from "@/lib/order-pricing";
 import {
+  type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useCart } from "@/context/cart-context";
 import { 
   Leaf, 
@@ -54,10 +55,13 @@ export default function Home() {
   const { data: gallery, isLoading: isLoadingGallery } = useGetGallery();
   const { data: stats } = useGetStoreStats();
   const { addItem } = useCart();
+  const [, setLocation] = useLocation();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
   const [orderItems, setOrderItems] = useState<OrderLineItem[]>([]);
+  const [productsCarouselApi, setProductsCarouselApi] = useState<CarouselApi>();
+  const [selectedProductSlide, setSelectedProductSlide] = useState(0);
 
   const productsList = (() => {
     const value: unknown = products;
@@ -113,6 +117,8 @@ export default function Home() {
     return [];
   })();
 
+  const featuredProducts = productsList.filter((p: any) => p?.featured || p?.badge);
+
   const fadeIn = {
     initial: { opacity: 0, y: 30 },
     whileInView: { opacity: 1, y: 0 },
@@ -133,6 +139,36 @@ export default function Home() {
     ]);
     setIsOrderFormOpen(true);
   };
+
+  const openProduct = (id: number) => {
+    setLocation(`/products/${id}?source=home`);
+  };
+
+  useEffect(() => {
+    if (!productsCarouselApi) return;
+
+    const syncSelectedSlide = () => {
+      setSelectedProductSlide(productsCarouselApi.selectedScrollSnap());
+    };
+
+    syncSelectedSlide();
+    productsCarouselApi.on("select", syncSelectedSlide);
+    productsCarouselApi.on("reInit", syncSelectedSlide);
+
+    const autoplay = window.setInterval(() => {
+      if (productsCarouselApi.canScrollNext()) {
+        productsCarouselApi.scrollNext();
+      } else {
+        productsCarouselApi.scrollTo(0);
+      }
+    }, 3500);
+
+    return () => {
+      window.clearInterval(autoplay);
+      productsCarouselApi.off("select", syncSelectedSlide);
+      productsCarouselApi.off("reInit", syncSelectedSlide);
+    };
+  }, [productsCarouselApi]);
 
   const growthTimeline = [
     {
@@ -166,7 +202,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <Navbar />
       {/* 1. Hero Section */}
-      <section id="home" className="relative h-[100dvh] min-h-[650px] flex items-center justify-center pt-20 overflow-hidden">
+      <section id="home" className="relative h-[100dvh] min-h-[650px] flex items-center justify-center pt-28 md:pt-32 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
             src="/images/hero-bg.png" 
@@ -182,7 +218,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="mb-8"
+            className="mb-8 mt-10 md:mt-14"
           >
             <Badge className="bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-md px-5 py-2 text-sm font-medium tracking-wide rounded-full shadow-2xl">
               <Leaf className="w-4 h-4 mr-2 inline-block text-secondary" /> 
@@ -212,18 +248,13 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto"
+            className="flex w-full justify-center"
           >
-            <a href={SITE_CONTACT.whatsappHref} target="_blank" rel="noopener noreferrer">
+            <Link href="/products" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto bg-secondary hover:bg-secondary/90 text-white font-semibold text-lg h-16 px-10 rounded-full shadow-2xl shadow-secondary/20 hover:shadow-secondary/40 transition-all hover:-translate-y-1">
-                Order on WhatsApp
+                Catalog / Price List
               </Button>
-            </a>
-            <a href="#products">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border-white/20 h-16 px-10 rounded-full backdrop-blur-md transition-all hover:-translate-y-1 text-lg">
-                View Harvest
-              </Button>
-            </a>
+            </Link>
           </motion.div>
 
           <motion.div 
@@ -238,45 +269,8 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-      {/* 2. Why Choose Us */}
-      <section className="py-24 bg-zinc-50 dark:bg-zinc-900/40 relative">
-        <div className="container px-4 md:px-6 mx-auto">
-          <motion.div {...fadeIn} className="text-center mb-20">
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">Our Promise</Badge>
-            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">Why Choose Our Farm</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">We nurture every plant with care to bring you the sweetest, healthiest dragon fruits directly from nature.</p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: Leaf, title: "Farm Fresh", desc: "Harvested on the day of dispatch for maximum freshness and flavor." },
-              { icon: Truck, title: "Fast Delivery", desc: "Express delivery right to your doorstep within 24-48 hours." },
-              { icon: ShieldCheck, title: "Premium Quality", desc: "Hand-picked, perfectly ripened fruits with zero chemical treatments." },
-              { icon: Package, title: "Secure Packaging", desc: "Eco-friendly, bruise-proof packaging to ensure safe transit." }
-            ].map((feature, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-              >
-                <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-zinc-900 text-center h-full rounded-2xl group">
-                  <CardContent className="pt-10 pb-8 px-8 flex flex-col items-center">
-                    <div className="w-20 h-20 rounded-2xl bg-primary/5 group-hover:bg-primary/10 transition-colors flex items-center justify-center mb-8 text-primary rotate-3 group-hover:rotate-6">
-                      <feature.icon className="w-10 h-10" />
-                    </div>
-                    <h3 className="font-heading font-bold text-2xl mb-4">{feature.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* 3. Products Section */}
-      <section id="products" className="py-24 md:py-32 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-900">
+      {/* 2. Products Section */}
+      <section id="products" className="relative z-10 pt-28 md:pt-36 pb-24 md:pb-32 bg-white dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-900">
         <div className="container px-4 md:px-6 mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
             <motion.div {...fadeIn} className="max-w-2xl">
@@ -290,7 +284,115 @@ export default function Home() {
             </motion.div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="md:hidden">
+            {isLoadingProducts ? (
+              <div className="flex flex-col space-y-4">
+                <Skeleton className="h-[300px] w-full rounded-2xl" />
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-12 w-full mt-4 rounded-full" />
+              </div>
+            ) : (
+              <Carousel setApi={setProductsCarouselApi} opts={{ align: "center", loop: true }} className="w-full px-1">
+                <CarouselContent className="-ml-3">
+                  {featuredProducts.map((product: any, i: number) => (
+                    <CarouselItem key={product.id} className="pl-3 basis-[78%]">
+                      <motion.div
+                        data-testid={`card-home-product-${product.id}`}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: Math.min(i * 0.08, 0.5) }}
+                        className={`h-full transition-all duration-300 ${selectedProductSlide === i ? "scale-100 opacity-100" : "scale-92 opacity-60"}`}
+                      >
+                        <Card
+                          className="overflow-hidden group h-full flex flex-col border border-zinc-100 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-900/80 cursor-pointer"
+                          onClick={() => openProduct(product.id)}
+                        >
+                          <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                            <img
+                              src={resolveAssetUrl(product.imageUrl)}
+                              alt={product.name}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                              onError={(e) => { (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE; }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                            {product.badge && (
+                              <Badge className={`absolute top-4 left-4 border-none shadow-lg px-3 py-1 font-bold uppercase tracking-wider text-[10px] ${
+                                product.badge === 'Top Seller' ? 'bg-secondary text-white' :
+                                product.badge === 'Best Product' ? 'bg-primary text-white' :
+                                product.badge === 'Premium' ? 'bg-yellow-500 text-white' :
+                                product.badge === 'Rare' ? 'bg-purple-600 text-white' :
+                                product.badge === 'Collector' ? 'bg-blue-600 text-white' :
+                                'bg-primary text-white'
+                              }`}>
+                                {product.badge}
+                              </Badge>
+                            )}
+                            {!product.inStock && (
+                              <div className="absolute inset-0 bg-white/80 dark:bg-black/70 flex items-center justify-center backdrop-blur-sm z-10">
+                                <Badge variant="outline" className="text-lg py-2 px-6 border-2 border-foreground bg-background font-bold">Out of Stock</Badge>
+                              </div>
+                            )}
+                          </div>
+                          <CardContent className="p-4 flex-1 flex flex-col">
+                            <h3 className="font-heading font-bold text-xl leading-tight mb-2">{product.name}</h3>
+                            <p className="text-muted-foreground mb-4 line-clamp-2 flex-1 text-sm leading-relaxed">
+                              {product.description}
+                            </p>
+                            <div className="mt-auto mb-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+                              <div className="flex items-baseline gap-1.5 flex-wrap">
+                                <span className="font-heading font-bold text-[1.75rem] leading-none text-foreground">
+                                  ₹{product.price}
+                                </span>
+                                <span className="text-sm font-normal text-muted-foreground font-sans">/ {product.unit}</span>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-full shadow-lg text-sm"
+                                disabled={!product.inStock}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  addItem({
+                                    id: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    unit: product.unit,
+                                    imageUrl: product.imageUrl,
+                                  });
+                                }}
+                              >
+                                <ShoppingCart className="w-4 h-4 mr-2" />
+                                Add to Cart
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-11 w-11 rounded-full border-secondary text-secondary hover:bg-secondary hover:text-white shrink-0"
+                                disabled={!product.inStock}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleBuyNow(product);
+                                }}
+                              >
+                                <MessageCircle className="w-5 h-5" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full border border-zinc-200 bg-white/50 text-foreground shadow-sm backdrop-blur-sm hover:bg-white/80 disabled:opacity-30" />
+                <CarouselNext className="right-2 top-1/2 z-20 h-10 w-10 -translate-y-1/2 rounded-full border border-zinc-200 bg-white/50 text-foreground shadow-sm backdrop-blur-sm hover:bg-white/80 disabled:opacity-30" />
+              </Carousel>
+            )}
+          </div>
+
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {isLoadingProducts ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex flex-col space-y-4">
@@ -302,15 +404,19 @@ export default function Home() {
               ))
             ) : (
               <>
-                {productsList.filter((p: any) => p?.featured || p?.badge).map((product: any, i: number) => (
+                {featuredProducts.map((product: any, i: number) => (
                   <motion.div
                     key={product.id}
+                    data-testid={`card-home-product-${product.id}`}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: Math.min(i * 0.08, 0.5) }}
                   >
-                    <Card className="overflow-hidden group h-full flex flex-col border border-zinc-100 dark:border-zinc-800 rounded-2xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-zinc-900/80">
+                    <Card
+                      className="overflow-hidden group h-full flex flex-col border border-zinc-100 dark:border-zinc-800 rounded-2xl hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-zinc-900/80 cursor-pointer"
+                      onClick={() => openProduct(product.id)}
+                    >
                       <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
                         <img 
                           src={resolveAssetUrl(product.imageUrl)} 
@@ -353,13 +459,16 @@ export default function Home() {
                           <Button
                             className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 rounded-full shadow-lg"
                             disabled={!product.inStock}
-                            onClick={() => addItem({
-                              id: product.id,
-                              name: product.name,
-                              price: product.price,
-                              unit: product.unit,
-                              imageUrl: product.imageUrl,
-                            })}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              addItem({
+                                id: product.id,
+                                name: product.name,
+                                price: product.price,
+                                unit: product.unit,
+                                imageUrl: product.imageUrl,
+                              });
+                            }}
                           >
                             <ShoppingCart className="w-4 h-4 mr-2" />
                             Add to Cart
@@ -369,7 +478,10 @@ export default function Home() {
                             size="icon"
                             className="h-12 w-12 rounded-full border-secondary text-secondary hover:bg-secondary hover:text-white shrink-0"
                             disabled={!product.inStock}
-                            onClick={() => handleBuyNow(product)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBuyNow(product);
+                            }}
                           >
                             <MessageCircle className="w-5 h-5" />
                           </Button>
@@ -378,91 +490,210 @@ export default function Home() {
                     </Card>
                   </motion.div>
                 ))}
-
-                {/* View All Products Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.5 }}
-                >
-                  <Link href="/products">
-                    <Card className="overflow-hidden group h-full flex flex-col border-2 border-dashed border-primary/30 hover:border-primary rounded-2xl hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 bg-primary/3 hover:bg-primary/5 cursor-pointer min-h-[400px]">
-                      <CardContent className="flex-1 flex flex-col items-center justify-center p-10 text-center gap-6">
-                        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                          <ArrowRight className="w-10 h-10 text-primary group-hover:translate-x-1 transition-transform" />
-                        </div>
-                        <div>
-                          <h3 className="font-heading font-bold text-2xl text-primary mb-3">View All Products</h3>
-                          <p className="text-muted-foreground text-sm leading-relaxed">
-                            Browse our complete catalog of 50+ premium dragon fruit plant varieties
-                          </p>
-                        </div>
-                        <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1.5 rounded-full font-semibold">
-                          50+ Varieties →
-                        </Badge>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                </motion.div>
               </>
             )}
           </div>
 
+          {!isLoadingProducts && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="mt-8 md:mt-10"
+            >
+              <Link href="/products">
+                <Card className="overflow-hidden border-2 border-dashed border-primary/30 hover:border-primary rounded-3xl hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 bg-primary/3 hover:bg-primary/5 cursor-pointer">
+                  <CardContent className="min-h-[140px] md:min-h-[160px] px-6 py-8 md:px-10 md:py-10 flex items-center justify-between gap-6">
+                    <div className="flex items-center gap-5 md:gap-6">
+                      <div>
+                        <h3 className="font-heading font-bold text-2xl md:text-3xl text-primary mb-2">View All Products</h3>
+                        <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-2xl">
+                          Browse our complete catalog of 50+ premium dragon fruit plant varieties.
+                        </p>
+                      </div>
+                    </div>
+                    <Badge className="shrink-0 bg-primary/10 text-primary border-primary/20 px-4 py-2 rounded-full font-semibold">
+                      50+ Varieties →
+                    </Badge>
+                  </CardContent>
+                </Card>
+              </Link>
+            </motion.div>
+          )}
+
         </div>
       </section>
-      {/* 4. Growth Timeline */}
-      <section className="py-20 md:py-24 bg-zinc-50 dark:bg-zinc-900/30 overflow-hidden border-y border-zinc-100 dark:border-zinc-800">
-        <div className="container px-4 md:px-6 mx-auto">
-          <motion.div {...fadeIn} className="text-center max-w-3xl mx-auto mb-14">
-            <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">
-              Plant Journey
-            </Badge>
-            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
-              Dragon Fruit Plant Growth Timeline
-            </h2>
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              From a new plant to full yield, here is the simple journey growers can expect with proper care and healthy nursery stock.
-            </p>
+      {/* 3. Reviews Slider */}
+      <section className="py-24 md:py-32 bg-white dark:bg-zinc-950 overflow-hidden">
+        <div className="container px-4 md:px-6 mx-auto relative">
+          {/* Decorative quote icon */}
+          <Quote className="absolute top-0 right-10 w-64 h-64 text-zinc-50 dark:text-zinc-900 -z-10 -rotate-12" />
+
+          <motion.div {...fadeIn} className="text-center mb-20 relative z-10">
+            <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">Testimonials</Badge>
+            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6">What Our Customers Say</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">Don't just take our word for it. Here's what families across the country think about our freshly harvested dragon fruits.</p>
           </motion.div>
 
-          <motion.div
-            {...fadeIn}
-            className="relative rounded-[2rem] border border-primary/30 bg-gradient-to-br from-primary via-rose-600 to-red-600 p-6 md:p-10 shadow-[0_30px_80px_rgba(225,29,72,0.22)]"
-          >
-            <div className="absolute inset-x-10 top-1/2 hidden xl:block h-[2px] -translate-y-1/2 bg-gradient-to-r from-primary/20 via-secondary/30 to-primary/20" />
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 relative">
-              {growthTimeline.map((item, index) => (
-                <motion.div
-                  key={item.month}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.08 }}
-                  className="relative rounded-[1.75rem] border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 p-6 shadow-lg"
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <Badge className="bg-primary/10 text-primary hover:bg-primary/15 px-3 py-1 rounded-full font-bold text-xs">
-                      {item.month}
-                    </Badge>
-                    <span className="font-heading text-3xl font-bold text-primary/20">
-                      0{index + 1}
-                    </span>
-                  </div>
-                  <h3 className="font-heading font-bold text-2xl mb-3 text-foreground">
-                    {item.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                    {item.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          {isLoadingReviews ? (
+            <div className="flex justify-center"><Skeleton className="h-[300px] w-full max-w-4xl rounded-3xl" /></div>
+          ) : reviewsList.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="max-w-6xl mx-auto px-10 md:px-16"
+            >
+              <Carousel
+                opts={{ align: "start", loop: true }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-4 md:-ml-8 py-4">
+                  {reviewsList.map((review: any) => (
+                    <CarouselItem key={review.id} className="pl-4 md:pl-8 md:basis-1/2">
+                      <div className="h-full">
+                        <Card className="h-full border-none shadow-xl shadow-zinc-100/50 hover:shadow-2xl transition-shadow bg-zinc-50/50 dark:bg-zinc-900/50 dark:shadow-none rounded-3xl overflow-hidden relative">
+                          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
+                          <CardContent className="p-10 relative h-full flex flex-col">
+                            <div className="flex items-center gap-1.5 mb-8">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star key={i} className={`w-5 h-5 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-zinc-200 dark:text-zinc-700"}`} />
+                              ))}
+                            </div>
+                            <p className="text-foreground text-xl mb-10 relative z-10 flex-1 font-medium leading-relaxed">
+                              "{review.comment}"
+                            </p>
+                            <div className="flex items-center gap-5 mt-auto">
+                              <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-xl uppercase overflow-hidden ring-4 ring-white dark:ring-zinc-800">
+                                {review.avatarUrl ? (
+                                  <img src={review.avatarUrl} alt={review.customerName} className="w-full h-full object-cover" />
+                                ) : (
+                                  review.customerName.charAt(0)
+                                )}
+                              </div>
+                              <div>
+                                <h4 className="font-heading font-bold text-lg">{review.customerName}</h4>
+                                <p className="text-sm text-secondary font-semibold">Verified Buyer</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="-left-4 md:-left-16 h-14 w-14 rounded-full border-none shadow-lg bg-white dark:bg-zinc-800 hover:bg-primary hover:text-white transition-colors" />
+                <CarouselNext className="-right-4 md:-right-16 h-14 w-14 rounded-full border-none shadow-lg bg-white dark:bg-zinc-800 hover:bg-primary hover:text-white transition-colors" />
+              </Carousel>
+            </motion.div>
+          )}
         </div>
       </section>
-      {/* 5. About the Farm */}
-      {/* 5. About the Farm */}
+      {/* 4. Gallery Section */}
+      <section id="gallery" className="py-24 md:py-32 bg-zinc-50 dark:bg-zinc-900/30">
+        <div className="container px-4 md:px-6 mx-auto">
+          <motion.div {...fadeIn} className="text-center mb-16 md:mb-24">
+            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">Farm Life</Badge>
+            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6">Inside Our Farm</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">A visual journey from planting the first seeds to harvesting the most beautiful dragon fruits you've ever seen.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+            {isLoadingGallery ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-square rounded-2xl" />
+              ))
+            ) : galleryList.slice(0, 6).map((img: any, i: number) => (
+              <motion.div
+                key={img.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500 bg-zinc-200 dark:bg-zinc-800"
+                onClick={() => setSelectedImage(img.imageUrl)}
+              >
+                <img
+                  src={img.imageUrl}
+                  alt={img.caption}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  onError={(e) => { (e.target as HTMLImageElement).src = GALLERY_FALLBACK_IMAGE; }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 md:p-8">
+                  <div className="translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                    <Badge variant="outline" className="text-white border-white/30 bg-white/10 backdrop-blur-md mb-3 px-3 py-1">{img.category}</Badge>
+                    <p className="text-white font-medium text-lg md:text-xl font-heading leading-tight">{img.caption}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
+            <DialogContent className="max-w-5xl w-full p-2 bg-transparent border-none shadow-none flex items-center justify-center">
+              {selectedImage && (
+                <div className="relative w-full">
+                  <img
+                    src={selectedImage}
+                    alt="Gallery view"
+                    className="w-full max-h-[85vh] object-contain rounded-xl shadow-2xl"
+                    onError={(e) => { (e.target as HTMLImageElement).src = GALLERY_FALLBACK_IMAGE; }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute -top-4 -right-4 bg-black text-white hover:bg-black/80 rounded-full h-10 w-10 border-2 border-white"
+                    onClick={() => setSelectedImage(null)}
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        </div>
+      </section>
+      {/* 5. Why Choose Us */}
+      <section className="relative z-0 py-24 bg-zinc-50 dark:bg-zinc-900/40">
+        <div className="container px-4 md:px-6 mx-auto">
+          <motion.div {...fadeIn} className="text-center mb-20">
+            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">Our Promise</Badge>
+            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">Why Choose Our Farm</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">We nurture every plant with care to bring you the sweetest, healthiest dragon fruits directly from nature.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { icon: Leaf, title: "Farm Fresh", desc: "Harvested on the day of dispatch for maximum freshness and flavor." },
+              { icon: Truck, title: "Fast Delivery", desc: "Express delivery right to your doorstep within 24-48 hours." },
+              { icon: ShieldCheck, title: "Premium Quality", desc: "Hand-picked, perfectly ripened fruits with zero chemical treatments." },
+              { icon: Package, title: "Secure Packaging", desc: "Eco-friendly, bruise-proof packaging to ensure safe transit." }
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+              >
+                <Card className="border-none shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 bg-white dark:bg-zinc-900 text-center h-full rounded-2xl group">
+                  <CardContent className="pt-10 pb-8 px-8 flex flex-col items-center">
+                    <div className="w-20 h-20 rounded-2xl bg-primary/5 group-hover:bg-primary/10 transition-colors flex items-center justify-center mb-8 text-primary rotate-3 group-hover:rotate-6">
+                      <feature.icon className="w-10 h-10" />
+                    </div>
+                    <h3 className="font-heading font-bold text-2xl mb-4">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+      {/* 6. About the Farm */}
+      {/* 6. About the Farm */}
       <section id="about" className="py-24 md:py-32 bg-zinc-50 dark:bg-zinc-900/30 overflow-hidden relative">
         <div className="container px-4 md:px-6 mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center">
@@ -553,135 +784,54 @@ export default function Home() {
           </div>
         </div>
       </section>
-      {/* 6. Reviews Slider */}
-      <section className="py-24 md:py-32 bg-white dark:bg-zinc-950 overflow-hidden">
-        <div className="container px-4 md:px-6 mx-auto relative">
-          {/* Decorative quote icon */}
-          <Quote className="absolute top-0 right-10 w-64 h-64 text-zinc-50 dark:text-zinc-900 -z-10 -rotate-12" />
-          
-          <motion.div {...fadeIn} className="text-center mb-20 relative z-10">
-            <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">Testimonials</Badge>
-            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6">What Our Customers Say</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">Don't just take our word for it. Here's what families across the country think about our freshly harvested dragon fruits.</p>
-          </motion.div>
-
-          {isLoadingReviews ? (
-            <div className="flex justify-center"><Skeleton className="h-[300px] w-full max-w-4xl rounded-3xl" /></div>
-          ) : reviewsList.length > 0 && (
-            <motion.div 
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="max-w-6xl mx-auto px-10 md:px-16"
-            >
-              <Carousel
-                opts={{ align: "start", loop: true }}
-                className="w-full"
-              >
-                <CarouselContent className="-ml-4 md:-ml-8 py-4">
-                  {reviewsList.map((review: any) => (
-                    <CarouselItem key={review.id} className="pl-4 md:pl-8 md:basis-1/2">
-                      <div className="h-full">
-                        <Card className="h-full border-none shadow-xl shadow-zinc-100/50 hover:shadow-2xl transition-shadow bg-zinc-50/50 dark:bg-zinc-900/50 dark:shadow-none rounded-3xl overflow-hidden relative">
-                          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
-                          <CardContent className="p-10 relative h-full flex flex-col">
-                            <div className="flex items-center gap-1.5 mb-8">
-                              {Array.from({ length: 5 }).map((_, i) => (
-                                <Star key={i} className={`w-5 h-5 ${i < review.rating ? "text-yellow-400 fill-yellow-400" : "text-zinc-200 dark:text-zinc-700"}`} />
-                              ))}
-                            </div>
-                            <p className="text-foreground text-xl mb-10 relative z-10 flex-1 font-medium leading-relaxed">
-                              "{review.comment}"
-                            </p>
-                            <div className="flex items-center gap-5 mt-auto">
-                              <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-xl uppercase overflow-hidden ring-4 ring-white dark:ring-zinc-800">
-                                {review.avatarUrl ? (
-                                  <img src={review.avatarUrl} alt={review.customerName} className="w-full h-full object-cover" />
-                                ) : (
-                                  review.customerName.charAt(0)
-                                )}
-                              </div>
-                              <div>
-                                <h4 className="font-heading font-bold text-lg">{review.customerName}</h4>
-                                <p className="text-sm text-secondary font-semibold">Verified Buyer</p>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="-left-4 md:-left-16 h-14 w-14 rounded-full border-none shadow-lg bg-white dark:bg-zinc-800 hover:bg-primary hover:text-white transition-colors" />
-                <CarouselNext className="-right-4 md:-right-16 h-14 w-14 rounded-full border-none shadow-lg bg-white dark:bg-zinc-800 hover:bg-primary hover:text-white transition-colors" />
-              </Carousel>
-            </motion.div>
-          )}
-        </div>
-      </section>
-      {/* 7. Gallery Section */}
-      <section id="gallery" className="py-24 md:py-32 bg-zinc-50 dark:bg-zinc-900/30">
+      {/* 7. Growth Timeline */}
+      <section className="py-20 md:py-24 bg-zinc-50 dark:bg-zinc-900/30 overflow-hidden border-y border-zinc-100 dark:border-zinc-800">
         <div className="container px-4 md:px-6 mx-auto">
-          <motion.div {...fadeIn} className="text-center mb-16 md:mb-24">
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">Farm Life</Badge>
-            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6">Inside Our Farm</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">A visual journey from planting the first seeds to harvesting the most beautiful dragon fruits you've ever seen.</p>
+          <motion.div {...fadeIn} className="text-center max-w-3xl mx-auto mb-14">
+            <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/20 mb-5 px-4 py-1.5 rounded-full text-sm font-semibold">
+              Plant Journey
+            </Badge>
+            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
+              Dragon Fruit Plant Growth Timeline
+            </h2>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              From a new plant to full yield, here is the simple journey growers can expect with proper care and healthy nursery stock.
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-            {isLoadingGallery ? (
-              Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-square rounded-2xl" />
-              ))
-            ) : galleryList.slice(0, 6).map((img: any, i: number) => (
-              <motion.div
-                key={img.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500 bg-zinc-200 dark:bg-zinc-800"
-                onClick={() => setSelectedImage(img.imageUrl)}
-              >
-                <img 
-                  src={img.imageUrl} 
-                  alt={img.caption} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  onError={(e) => { (e.target as HTMLImageElement).src = GALLERY_FALLBACK_IMAGE; }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 md:p-8">
-                  <div className="translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                    <Badge variant="outline" className="text-white border-white/30 bg-white/10 backdrop-blur-md mb-3 px-3 py-1">{img.category}</Badge>
-                    <p className="text-white font-medium text-lg md:text-xl font-heading leading-tight">{img.caption}</p>
+          <motion.div
+            {...fadeIn}
+            className="relative rounded-[2rem] border border-primary/30 bg-gradient-to-br from-primary via-rose-600 to-red-600 p-6 md:p-10 shadow-[0_30px_80px_rgba(225,29,72,0.22)]"
+          >
+            <div className="absolute inset-x-10 top-1/2 hidden xl:block h-[2px] -translate-y-1/2 bg-gradient-to-r from-primary/20 via-secondary/30 to-primary/20" />
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 relative">
+              {growthTimeline.map((item, index) => (
+                <motion.div
+                  key={item.month}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                  className="relative rounded-[1.75rem] border border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 p-6 shadow-lg"
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <Badge className="bg-primary/10 text-primary hover:bg-primary/15 px-3 py-1 rounded-full font-bold text-xs">
+                      {item.month}
+                    </Badge>
+                    <span className="font-heading text-3xl font-bold text-primary/20">
+                      0{index + 1}
+                    </span>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
-            <DialogContent className="max-w-5xl w-full p-2 bg-transparent border-none shadow-none flex items-center justify-center">
-              {selectedImage && (
-                <div className="relative w-full">
-                  <img
-                    src={selectedImage}
-                    alt="Gallery view"
-                    className="w-full max-h-[85vh] object-contain rounded-xl shadow-2xl"
-                    onError={(e) => { (e.target as HTMLImageElement).src = GALLERY_FALLBACK_IMAGE; }}
-                  />
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute -top-4 -right-4 bg-black text-white hover:bg-black/80 rounded-full h-10 w-10 border-2 border-white"
-                    onClick={() => setSelectedImage(null)}
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
+                  <h3 className="font-heading font-bold text-2xl mb-3 text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                    {item.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
       {/* 8. Contact Section */}

@@ -40,10 +40,26 @@ export default function ProductDetail({ params }: ProductDetailProps) {
   const [, setLocation] = useLocation();
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
   const [orderItems, setOrderItems] = useState<OrderLineItem[]>([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const source =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("source")
+      : null;
+  const backHref = source === "home" ? "/" : "/products";
+  const backLabel = source === "home" ? "Back to Home" : "Back to Catalog";
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setActiveImageIndex(0);
   }, [id]);
+
+  const productImages = [
+    product?.imageUrl1 ?? product?.imageUrl,
+    product?.imageUrl2,
+    product?.imageUrl3,
+    product?.imageUrl4,
+    product?.imageUrl5,
+  ].filter((value): value is string => typeof value === "string" && value.trim().length > 0);
 
   const relatedProducts = (allProducts ?? [])
     .filter((p) => p.id !== id)
@@ -80,8 +96,8 @@ export default function ProductDetail({ params }: ProductDetailProps) {
           <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
           <h2 className="font-heading font-bold text-3xl mb-2">Plant not found</h2>
           <p className="text-muted-foreground mb-8">The plant you are looking for does not exist.</p>
-          <Link href="/products">
-            <Button className="rounded-full">Back to Catalog</Button>
+          <Link href={backHref}>
+            <Button className="rounded-full">{backLabel}</Button>
           </Link>
         </div>
         <Footer />
@@ -119,12 +135,12 @@ export default function ProductDetail({ params }: ProductDetailProps) {
 
         {/* Back button */}
         <button
-          onClick={() => setLocation("/products")}
+          onClick={() => setLocation(backHref)}
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8 group"
           data-testid="button-back-to-catalog"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Back to Catalog
+          {backLabel}
         </button>
 
         {/* Main Product Layout */}
@@ -138,7 +154,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
           >
             <div className="rounded-2xl overflow-hidden bg-muted aspect-square shadow-xl">
               <img
-                src={resolveAssetUrl(product.imageUrl)}
+                src={resolveAssetUrl(productImages[activeImageIndex] ?? product.imageUrl)}
                 alt={product.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -146,6 +162,32 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                 }}
               />
             </div>
+
+            {productImages.length > 1 ? (
+              <div className="mt-4 grid grid-cols-5 gap-3">
+                {productImages.map((imageUrl, index) => (
+                  <button
+                    key={`${imageUrl}-${index}`}
+                    type="button"
+                    onClick={() => setActiveImageIndex(index)}
+                    className={`overflow-hidden rounded-xl border transition ${
+                      activeImageIndex === index
+                        ? "border-primary shadow-md"
+                        : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    <img
+                      src={resolveAssetUrl(imageUrl)}
+                      alt={`${product.name} view ${index + 1}`}
+                      className="h-18 w-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = PRODUCT_FALLBACK_IMAGE;
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             {/* Badges overlay */}
             <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -340,7 +382,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.07 }}
                   className="group rounded-xl overflow-hidden border border-border bg-card hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
-                  onClick={() => setLocation(`/products/${p.id}`)}
+                  onClick={() => setLocation(`/products/${p.id}?source=${source === "home" ? "home" : "catalog"}`)}
                   data-testid={`card-related-${p.id}`}
                 >
                   <div className="h-36 overflow-hidden bg-muted">

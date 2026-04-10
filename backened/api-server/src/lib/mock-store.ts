@@ -25,6 +25,11 @@ export interface MockProduct {
   price: number;
   unit: string;
   imageUrl: string;
+  imageUrl1: string;
+  imageUrl2: string | null;
+  imageUrl3: string | null;
+  imageUrl4: string | null;
+  imageUrl5: string | null;
   badge: string | null;
   inStock: boolean;
   featured: boolean;
@@ -36,7 +41,11 @@ export interface MockProductInput {
   description: string;
   price: number;
   unit: string;
-  imageUrl: string;
+  imageUrl1: string;
+  imageUrl2?: string | null;
+  imageUrl3?: string | null;
+  imageUrl4?: string | null;
+  imageUrl5?: string | null;
   badge?: string | null;
   inStock?: boolean;
   featured?: boolean;
@@ -260,18 +269,27 @@ function loadSeedProducts(): SeedProduct[] {
 }
 
 function buildMockProducts(): MockProduct[] {
-  return loadSeedProducts().map((product, index) => ({
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    price: Number(product.price),
-    unit: DEFAULT_UNIT,
-    imageUrl: normalizeImageUrl(product.image, index),
-    badge: badgeById.get(product.id) ?? null,
-    inStock: true,
-    featured: featuredIds.has(product.id),
-    createdAt: new Date(Date.UTC(2026, 0, index + 1)),
-  }));
+  return loadSeedProducts().map((product, index) => {
+    const primaryImage = normalizeImageUrl(product.image, index);
+
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: Number(product.price),
+      unit: DEFAULT_UNIT,
+      imageUrl: primaryImage,
+      imageUrl1: primaryImage,
+      imageUrl2: null,
+      imageUrl3: null,
+      imageUrl4: null,
+      imageUrl5: null,
+      badge: badgeById.get(product.id) ?? null,
+      inStock: true,
+      featured: featuredIds.has(product.id),
+      createdAt: new Date(Date.UTC(2026, 0, index + 1)),
+    };
+  });
 }
 
 function ensureProductStore(): MockProduct[] {
@@ -300,7 +318,12 @@ export function createMockProduct(input: MockProductInput): MockProduct {
     description: input.description,
     price: Number(input.price),
     unit: input.unit || DEFAULT_UNIT,
-    imageUrl: input.imageUrl || DEFAULT_PRODUCT_IMAGE,
+    imageUrl: input.imageUrl1 || DEFAULT_PRODUCT_IMAGE,
+    imageUrl1: input.imageUrl1 || DEFAULT_PRODUCT_IMAGE,
+    imageUrl2: input.imageUrl2 ?? null,
+    imageUrl3: input.imageUrl3 ?? null,
+    imageUrl4: input.imageUrl4 ?? null,
+    imageUrl5: input.imageUrl5 ?? null,
     badge: input.badge ?? null,
     inStock: input.inStock ?? true,
     featured: input.featured ?? false,
@@ -328,7 +351,12 @@ export function updateMockProduct(
     description: input.description,
     price: Number(input.price),
     unit: input.unit || DEFAULT_UNIT,
-    imageUrl: input.imageUrl || DEFAULT_PRODUCT_IMAGE,
+    imageUrl: input.imageUrl1 || DEFAULT_PRODUCT_IMAGE,
+    imageUrl1: input.imageUrl1 || DEFAULT_PRODUCT_IMAGE,
+    imageUrl2: input.imageUrl2 ?? null,
+    imageUrl3: input.imageUrl3 ?? null,
+    imageUrl4: input.imageUrl4 ?? null,
+    imageUrl5: input.imageUrl5 ?? null,
     badge: input.badge ?? null,
     inStock: input.inStock ?? true,
     featured: input.featured ?? false,

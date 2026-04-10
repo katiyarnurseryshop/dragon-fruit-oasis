@@ -9,9 +9,10 @@ import { SITE_CONTACT } from "@/lib/site-contact";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
-  const { openCart, totalCount } = useCart();
+  const { openCart, totalCount, cartPulse } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isCartAnimating, setIsCartAnimating] = useState(false);
   const [location] = useLocation();
 
   const isHome = location === "/";
@@ -24,6 +25,14 @@ export function Navbar() {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (cartPulse === 0) return;
+
+    setIsCartAnimating(true);
+    const timeout = window.setTimeout(() => setIsCartAnimating(false), 650);
+    return () => window.clearTimeout(timeout);
+  }, [cartPulse]);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -101,14 +110,14 @@ export function Navbar() {
           </Button>
           <button
             onClick={openCart}
-            className={`relative p-2 rounded-full transition-colors ${
+            className={`relative p-2 rounded-full transition-all duration-300 ${
               transparent ? "text-white hover:bg-white/20" : "hover:bg-muted"
-            }`}
+            } ${isCartAnimating ? "scale-110" : "scale-100"}`}
             aria-label="Open cart"
           >
             <ShoppingCart className="w-5 h-5" />
             {totalCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              <span className={`absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 transition-transform duration-300 ${isCartAnimating ? "scale-125" : "scale-100"}`}>
                 {totalCount}
               </span>
             )}
@@ -133,16 +142,16 @@ export function Navbar() {
           </Button>
           <button
             onClick={openCart}
-            className={`relative p-2 rounded-full transition-colors ${
+            className={`relative p-2 rounded-full transition-all duration-300 ${
               transparent && !mobileMenuOpen
                 ? "text-white hover:bg-white/20"
                 : "hover:bg-muted text-foreground"
-            }`}
+            } ${isCartAnimating ? "scale-110" : "scale-100"}`}
             aria-label="Open cart"
           >
             <ShoppingCart className="w-5 h-5" />
             {totalCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              <span className={`absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 transition-transform duration-300 ${isCartAnimating ? "scale-125" : "scale-100"}`}>
                 {totalCount}
               </span>
             )}

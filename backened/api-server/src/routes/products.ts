@@ -13,6 +13,24 @@ import { saveProductImageFromDataUrl } from "../lib/product-image-storage";
 
 const router: IRouter = Router();
 
+function normalizeProductResponse<T extends Record<string, unknown>>(product: T) {
+  const imageUrl1 = typeof product.imageUrl1 === "string" && product.imageUrl1.trim()
+    ? product.imageUrl1
+    : typeof product.imageUrl === "string" && product.imageUrl.trim()
+      ? product.imageUrl
+      : "";
+
+  return {
+    ...product,
+    imageUrl: imageUrl1,
+    imageUrl1,
+    imageUrl2: (product.imageUrl2 as string | null | undefined) ?? null,
+    imageUrl3: (product.imageUrl3 as string | null | undefined) ?? null,
+    imageUrl4: (product.imageUrl4 as string | null | undefined) ?? null,
+    imageUrl5: (product.imageUrl5 as string | null | undefined) ?? null,
+  };
+}
+
 function parseProductId(rawId: string | string[]) {
   return Number.parseInt(Array.isArray(rawId) ? rawId[0] ?? "" : rawId, 10);
 }
@@ -34,7 +52,7 @@ router.get("/products", async (req, res) => {
   try {
     const products = await db.select().from(productsTable).orderBy(productsTable.createdAt);
     const result = products.map((p) => ({
-      ...p,
+      ...normalizeProductResponse(p),
       price: parseFloat(p.price),
       badge: p.badge ?? null,
     }));
@@ -47,8 +65,29 @@ router.get("/products", async (req, res) => {
 
 router.post("/products", requireAdmin, async (req, res) => {
   try {
-    const { name, description, price, unit, imageUrl, badge, inStock, featured } = req.body;
-    if (!name || !description || price == null || !unit || !imageUrl) {
+    const {
+      name,
+      description,
+      price,
+      unit,
+      imageUrl,
+      imageUrl1,
+      imageUrl2,
+      imageUrl3,
+      imageUrl4,
+      imageUrl5,
+      badge,
+      inStock,
+      featured,
+    } = req.body;
+    const primaryImageUrl =
+      typeof imageUrl1 === "string" && imageUrl1.trim()
+        ? imageUrl1.trim()
+        : typeof imageUrl === "string" && imageUrl.trim()
+          ? imageUrl.trim()
+          : "";
+
+    if (!name || !description || price == null || !unit || !primaryImageUrl) {
       res.status(400).json({ error: "validation_error", message: "Missing required fields" });
       return;
     }
@@ -59,7 +98,11 @@ router.post("/products", requireAdmin, async (req, res) => {
         description,
         price: Number(price),
         unit,
-        imageUrl,
+        imageUrl1: primaryImageUrl,
+        imageUrl2,
+        imageUrl3,
+        imageUrl4,
+        imageUrl5,
         badge: badge || null,
         inStock: inStock ?? true,
         featured: featured ?? false,
@@ -75,13 +118,21 @@ router.post("/products", requireAdmin, async (req, res) => {
         description,
         price: String(price),
         unit: unit || "Kg",
-        imageUrl,
+        imageUrl1: primaryImageUrl,
+        imageUrl2: imageUrl2 || null,
+        imageUrl3: imageUrl3 || null,
+        imageUrl4: imageUrl4 || null,
+        imageUrl5: imageUrl5 || null,
         badge: badge || null,
         inStock: inStock ?? true,
         featured: featured ?? false,
       })
       .returning();
-    res.status(201).json({ ...product, price: parseFloat(product.price), badge: product.badge ?? null });
+    res.status(201).json({
+      ...normalizeProductResponse(product),
+      price: parseFloat(product.price),
+      badge: product.badge ?? null,
+    });
   } catch (err) {
     req.log.error({ err }, "Failed to create product");
     res.status(500).json({
@@ -148,7 +199,11 @@ router.get("/products/:id", async (req, res) => {
       res.status(404).json({ error: "not_found", message: "Product not found" });
       return;
     }
-    res.json({ ...product, price: parseFloat(product.price), badge: product.badge ?? null });
+    res.json({
+      ...normalizeProductResponse(product),
+      price: parseFloat(product.price),
+      badge: product.badge ?? null,
+    });
   } catch (err) {
     req.log.warn({ err, id: req.params.id }, "Database product lookup unavailable, falling back to mock data");
     const id = parseProductId(req.params.id);
@@ -168,7 +223,27 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
       res.status(400).json({ error: "invalid_id", message: "Invalid product ID" });
       return;
     }
-    const { name, description, price, unit, imageUrl, badge, inStock, featured } = req.body;
+    const {
+      name,
+      description,
+      price,
+      unit,
+      imageUrl,
+      imageUrl1,
+      imageUrl2,
+      imageUrl3,
+      imageUrl4,
+      imageUrl5,
+      badge,
+      inStock,
+      featured,
+    } = req.body;
+    const primaryImageUrl =
+      typeof imageUrl1 === "string" && imageUrl1.trim()
+        ? imageUrl1.trim()
+        : typeof imageUrl === "string" && imageUrl.trim()
+          ? imageUrl.trim()
+          : "";
 
     if (!db) {
       const product = updateMockProduct(id, {
@@ -176,7 +251,11 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
         description,
         price: Number(price),
         unit,
-        imageUrl,
+        imageUrl1: primaryImageUrl,
+        imageUrl2,
+        imageUrl3,
+        imageUrl4,
+        imageUrl5,
         badge: badge || null,
         inStock,
         featured,
@@ -196,7 +275,11 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
         description,
         price: String(price),
         unit,
-        imageUrl,
+        imageUrl1: primaryImageUrl,
+        imageUrl2: imageUrl2 || null,
+        imageUrl3: imageUrl3 || null,
+        imageUrl4: imageUrl4 || null,
+        imageUrl5: imageUrl5 || null,
         badge: badge || null,
         inStock,
         featured,
@@ -207,7 +290,11 @@ router.put("/products/:id", requireAdmin, async (req, res) => {
       res.status(404).json({ error: "not_found", message: "Product not found" });
       return;
     }
-    res.json({ ...product, price: parseFloat(product.price), badge: product.badge ?? null });
+    res.json({
+      ...normalizeProductResponse(product),
+      price: parseFloat(product.price),
+      badge: product.badge ?? null,
+    });
   } catch (err) {
     req.log.error({ err }, "Failed to update product");
     res.status(500).json({

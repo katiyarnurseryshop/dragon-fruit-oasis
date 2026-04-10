@@ -142,9 +142,13 @@ export function formatCurrency(amount: number) {
 
 export interface OrderCustomerDetails {
   name: string;
-  phone: string;
-  address: string;
   pinCode: string;
+  phone: string;
+  doorNo: string;
+  address: string;
+  landmark: string;
+  state: string;
+  alternatePhone: string;
 }
 
 export function createOrderMessage(items: OrderLineItem[], customer: OrderCustomerDetails) {
@@ -163,9 +167,13 @@ export function createOrderMessage(items: OrderLineItem[], customer: OrderCustom
     "",
     "Customer Details:",
     `Name: ${customer.name}`,
+    `Pincode: ${customer.pinCode}`,
     `Phone Number: ${customer.phone}`,
+    `Door No: ${customer.doorNo}`,
     `Address: ${customer.address}`,
-    `Pin Code: ${customer.pinCode}`,
+    `Landmark: ${customer.landmark}`,
+    `State: ${customer.state}`,
+    `Alternative Phone Number: ${customer.alternatePhone || "N/A"}`,
     "",
     "Order Details:",
     ...productLines,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Minus, Plus, MapPin, MessageCircle, Phone, ShoppingBag, User } from "lucide-react";
+import { Minus, Plus, MapPin, MessageCircle, Phone, ShoppingBag, User, Home, Landmark, MapPinned } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,9 +33,13 @@ interface OrderFormDialogProps {
 
 const EMPTY_FORM: OrderCustomerDetails = {
   name: "",
-  phone: "",
-  address: "",
   pinCode: "",
+  phone: "",
+  doorNo: "",
+  address: "",
+  landmark: "",
+  state: "",
+  alternatePhone: "",
 };
 
 export function OrderFormDialog({
@@ -85,11 +89,17 @@ export function OrderFormDialog({
     const nextErrors: Partial<Record<keyof OrderCustomerDetails, string>> = {};
 
     if (!form.name.trim()) nextErrors.name = "Name is required";
+    if (!form.pinCode.trim()) nextErrors.pinCode = "Pincode is required";
+    if (!/^\d{6}$/.test(form.pinCode.trim())) nextErrors.pinCode = "Pincode must be 6 digits";
     if (!form.phone.trim()) nextErrors.phone = "Phone number is required";
     if (!/^\+?\d[\d\s-]{8,}$/.test(form.phone.trim())) nextErrors.phone = "Enter a valid phone number";
+    if (!form.doorNo.trim()) nextErrors.doorNo = "Door no is required";
     if (!form.address.trim()) nextErrors.address = "Address is required";
-    if (!form.pinCode.trim()) nextErrors.pinCode = "Pin code is required";
-    if (!/^\d{6}$/.test(form.pinCode.trim())) nextErrors.pinCode = "Pin code must be 6 digits";
+    if (!form.landmark.trim()) nextErrors.landmark = "Landmark is required";
+    if (!form.state.trim()) nextErrors.state = "State is required";
+    if (form.alternatePhone.trim() && !/^\+?\d[\d\s-]{8,}$/.test(form.alternatePhone.trim())) {
+      nextErrors.alternatePhone = "Enter a valid alternate phone number";
+    }
     if (orderItems.length === 0) nextErrors.name = "Please add at least one product";
 
     setErrors(nextErrors);
@@ -101,9 +111,13 @@ export function OrderFormDialog({
 
     const message = createOrderMessage(orderItems, {
       name: form.name.trim(),
-      phone: form.phone.trim(),
-      address: form.address.trim(),
       pinCode: form.pinCode.trim(),
+      phone: form.phone.trim(),
+      doorNo: form.doorNo.trim(),
+      address: form.address.trim(),
+      landmark: form.landmark.trim(),
+      state: form.state.trim(),
+      alternatePhone: form.alternatePhone.trim(),
     });
 
     window.open(createWhatsAppOrderUrl(message), "_blank", "noopener,noreferrer");
@@ -216,6 +230,21 @@ export function OrderFormDialog({
 
               <div>
                 <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <MapPinned className="h-4 w-4 text-primary" />
+                  Pincode
+                </label>
+                <Input
+                  value={form.pinCode}
+                  onChange={(e) => setForm((prev) => ({ ...prev, pinCode: e.target.value }))}
+                  placeholder="Enter 6 digit pincode"
+                  className="h-11 rounded-xl"
+                  maxLength={6}
+                />
+                {errors.pinCode && <p className="mt-1 text-xs text-destructive">{errors.pinCode}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
                   <Phone className="h-4 w-4 text-primary" />
                   Phone Number
                 </label>
@@ -230,31 +259,72 @@ export function OrderFormDialog({
 
               <div>
                 <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <Home className="h-4 w-4 text-primary" />
+                  Door No
+                </label>
+                <Input
+                  value={form.doorNo}
+                  onChange={(e) => setForm((prev) => ({ ...prev, doorNo: e.target.value }))}
+                  placeholder="Enter door no / house no"
+                  className="h-11 rounded-xl"
+                />
+                {errors.doorNo && <p className="mt-1 text-xs text-destructive">{errors.doorNo}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
                   <MapPin className="h-4 w-4 text-primary" />
                   Address
                 </label>
                 <Textarea
                   value={form.address}
                   onChange={(e) => setForm((prev) => ({ ...prev, address: e.target.value }))}
-                  placeholder="House no, street, area, city, state"
-                  className="min-h-[110px] rounded-xl"
+                  placeholder="Enter full address"
+                  className="min-h-[90px] rounded-xl"
                 />
                 {errors.address && <p className="mt-1 text-xs text-destructive">{errors.address}</p>}
               </div>
 
               <div>
                 <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  Pin Code
+                  <Landmark className="h-4 w-4 text-primary" />
+                  Landmark
                 </label>
                 <Input
-                  value={form.pinCode}
-                  onChange={(e) => setForm((prev) => ({ ...prev, pinCode: e.target.value }))}
-                  placeholder="6 digit pin code"
+                  value={form.landmark}
+                  onChange={(e) => setForm((prev) => ({ ...prev, landmark: e.target.value }))}
+                  placeholder="Enter nearby landmark"
                   className="h-11 rounded-xl"
-                  maxLength={6}
                 />
-                {errors.pinCode && <p className="mt-1 text-xs text-destructive">{errors.pinCode}</p>}
+                {errors.landmark && <p className="mt-1 text-xs text-destructive">{errors.landmark}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  State
+                </label>
+                <Input
+                  value={form.state}
+                  onChange={(e) => setForm((prev) => ({ ...prev, state: e.target.value }))}
+                  placeholder="Enter state"
+                  className="h-11 rounded-xl"
+                />
+                {errors.state && <p className="mt-1 text-xs text-destructive">{errors.state}</p>}
+              </div>
+
+              <div>
+                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <Phone className="h-4 w-4 text-primary" />
+                  Alternative Phone Number
+                </label>
+                <Input
+                  value={form.alternatePhone}
+                  onChange={(e) => setForm((prev) => ({ ...prev, alternatePhone: e.target.value }))}
+                  placeholder="Optional alternate number"
+                  className="h-11 rounded-xl"
+                />
+                {errors.alternatePhone && <p className="mt-1 text-xs text-destructive">{errors.alternatePhone}</p>}
               </div>
 
               <div className="rounded-2xl border border-primary/15 bg-primary/5 p-4 text-sm text-muted-foreground">

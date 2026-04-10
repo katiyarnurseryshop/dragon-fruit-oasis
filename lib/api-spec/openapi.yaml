@@ -201,6 +201,20 @@ components:
           type: string
         imageUrl:
           type: string
+        imageUrl1:
+          type: string
+        imageUrl2:
+          type: string
+          nullable: true
+        imageUrl3:
+          type: string
+          nullable: true
+        imageUrl4:
+          type: string
+          nullable: true
+        imageUrl5:
+          type: string
+          nullable: true
         badge:
           type: string
           nullable: true
@@ -231,8 +245,20 @@ components:
           type: number
         unit:
           type: string
-        imageUrl:
+        imageUrl1:
           type: string
+        imageUrl2:
+          type: string
+          nullable: true
+        imageUrl3:
+          type: string
+          nullable: true
+        imageUrl4:
+          type: string
+          nullable: true
+        imageUrl5:
+          type: string
+          nullable: true
         badge:
           type: string
           nullable: true
@@ -245,7 +271,7 @@ components:
         - description
         - price
         - unit
-        - imageUrl
+        - imageUrl1
         - inStock
         - featured
     Review:

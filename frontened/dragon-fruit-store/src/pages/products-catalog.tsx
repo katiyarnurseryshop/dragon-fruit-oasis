@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useGetProducts, useGetStoreStats } from "@workspace/api-client-react";
 import { useLocation } from "wouter";
@@ -44,6 +44,10 @@ export default function ProductsCatalog() {
   const [page, setPage] = useState(1);
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
   const [orderItems, setOrderItems] = useState<OrderLineItem[]>([]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const productsList = (() => {
     const value: unknown = products;
@@ -97,7 +101,7 @@ export default function ProductsCatalog() {
   };
 
   const openProduct = (id: number) => {
-    setLocation(`/products/${id}`);
+    setLocation(`/products/${id}?source=catalog`);
   };
 
   const handleBuyNow = (product: any) => {

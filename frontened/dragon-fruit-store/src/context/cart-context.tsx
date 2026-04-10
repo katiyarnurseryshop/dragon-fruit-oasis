@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from "react";
 
 export interface CartItem {
   id: number;
@@ -12,6 +12,7 @@ export interface CartItem {
 interface CartContextValue {
   items: CartItem[];
   isOpen: boolean;
+  cartPulse: number;
   openCart: () => void;
   closeCart: () => void;
   addItem: (item: Omit<CartItem, "quantity">) => void;
@@ -23,10 +24,24 @@ interface CartContextValue {
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
+const CART_STORAGE_KEY = "dragon-fruit-oasis-cart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+
+    try {
+      const stored = window.localStorage.getItem(CART_STORAGE_KEY);
+      if (!stored) return [];
+
+      const parsed: unknown = JSON.parse(stored);
+      return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isOpen, setIsOpen] = useState(false);
+  const [cartPulse, setCartPulse] = useState(0);
 
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
@@ -41,7 +56,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...item, quantity: 1 }];
     });
-    setIsOpen(true);
+    setCartPulse((prev) => prev + 1);
   }, []);
 
   const removeItem = useCallback((id: number) => {
@@ -60,12 +75,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setItems([]), []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
+
   const totalCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   return (
     <CartContext.Provider
-      value={{ items, isOpen, openCart, closeCart, addItem, removeItem, updateQty, clearCart, totalCount, totalPrice }}
+      value={{ items, isOpen, cartPulse, openCart, closeCart, addItem, removeItem, updateQty, clearCart, totalCount, totalPrice }}
     >
       {children}
     </CartContext.Provider>
