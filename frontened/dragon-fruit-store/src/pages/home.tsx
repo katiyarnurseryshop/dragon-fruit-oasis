@@ -202,7 +202,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <Navbar />
       {/* 1. Hero Section */}
-      <section id="home" className="relative h-[100dvh] min-h-[650px] flex items-center justify-center pt-28 md:pt-32 overflow-hidden">
+      <section id="home" className="relative min-h-[100dvh] md:h-[100dvh] flex items-center justify-center pt-24 pb-12 md:pt-32 md:pb-0 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
             src="/images/hero-bg.png" 
@@ -218,7 +218,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="mb-8 mt-10 md:mt-14"
+            className="mb-6 mt-8 md:mb-8 md:mt-14"
           >
             <Badge className="bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-md px-5 py-2 text-sm font-medium tracking-wide rounded-full shadow-2xl">
               <Leaf className="w-4 h-4 mr-2 inline-block text-secondary" /> 
@@ -230,16 +230,16 @@ export default function Home() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-heading font-bold text-5xl md:text-6xl lg:text-7xl xl:text-8xl max-w-5xl leading-[1.1] mb-8 drop-shadow-xl"
+            className="font-heading font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl max-w-5xl leading-[1.05] md:leading-[1.1] mb-6 md:mb-8 drop-shadow-xl"
           >
-            Fresh Organic Dragon Fruits Delivered To Your Door
+            Fresh Organic Dragon Fruits Plant Delivered To Your Door
           </motion.h1>
           
           <motion.p 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-xl md:text-2xl text-zinc-200 mb-12 max-w-2xl font-light tracking-wide drop-shadow-md"
+            className="text-lg md:text-2xl text-zinc-200 mb-8 md:mb-12 max-w-2xl font-light tracking-wide drop-shadow-md"
           >
             Pure • Fresh • Premium Quality
           </motion.p>
@@ -261,7 +261,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1 }}
-            className="flex flex-wrap justify-center gap-8 mt-20 text-sm md:text-base font-medium text-zinc-200"
+            className="flex flex-wrap justify-center gap-x-6 gap-y-3 mt-10 md:mt-20 text-sm md:text-base font-medium text-zinc-200"
           >
             <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> 100% Natural</div>
             <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> Farm-to-home</div>
