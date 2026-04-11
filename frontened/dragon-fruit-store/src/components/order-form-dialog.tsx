@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { createWhatsAppOrderUrl } from "@/lib/site-contact";
+import { resolveAssetUrl } from "@/lib/asset-url";
 import {
   OrderLineItem,
   OrderCustomerDetails,
@@ -21,6 +22,8 @@ import {
   getTotalPlantQuantity,
   useDeliveryChargeRules,
 } from "@/lib/order-pricing";
+
+const ORDER_FALLBACK_IMAGE = "/images/gallery-1.png";
 
 interface OrderFormDialogProps {
   open: boolean;
@@ -149,9 +152,12 @@ export function OrderFormDialog({
                       <div key={item.id} className="rounded-2xl bg-black/15 p-3">
                         <div className="flex items-start gap-3">
                           <img
-                          src={resolveAssetUrl(item.imageUrl)}
+                            src={resolveAssetUrl(item.imageUrl) || ORDER_FALLBACK_IMAGE}
                             alt={item.name}
                             className="h-14 w-14 rounded-xl object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = ORDER_FALLBACK_IMAGE;
+                            }}
                           />
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-semibold">{item.name}</p>
@@ -348,4 +354,3 @@ export function OrderFormDialog({
     </Dialog>
   );
 }
-import { resolveAssetUrl } from "@/lib/asset-url";

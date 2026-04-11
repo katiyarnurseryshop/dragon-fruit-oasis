@@ -12,6 +12,8 @@ export const SITE_CONTACT = {
   locationLabel: "Kanpur, Uttar Pradesh",
 } as const;
 
+const ORDER_WHATSAPP_NUMBER = "918112929020";
+
 export function createWhatsAppOrderUrl(message: string) {
-  return `${SITE_CONTACT.whatsappHref}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${ORDER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }

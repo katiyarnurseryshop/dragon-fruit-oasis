@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SITE_CONTACT } from "@/lib/site-contact";
-import { resolveAssetUrl } from "@/lib/asset-url";
+import { getProductPrimaryImage, resolveAssetUrl } from "@/lib/asset-url";
 import { useCart } from "@/context/cart-context";
 import { OrderFormDialog } from "@/components/order-form-dialog";
 import { OrderLineItem } from "@/lib/order-pricing";
@@ -113,7 +113,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
         name: product.name,
         price: product.price,
         unit: product.unit,
-        imageUrl: product.imageUrl,
+        imageUrl: getProductPrimaryImage(product),
         quantity: 1,
       },
     ]);
@@ -314,7 +314,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                       name: product.name,
                       price: product.price,
                       unit: product.unit,
-                      imageUrl: product.imageUrl,
+                      imageUrl: getProductPrimaryImage(product),
                     })
                   }
                 >

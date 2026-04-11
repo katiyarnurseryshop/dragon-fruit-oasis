@@ -5,6 +5,9 @@ import { useCart } from "@/context/cart-context";
 import { Button } from "@/components/ui/button";
 import { OrderFormDialog } from "@/components/order-form-dialog";
 import { formatCurrency, getDeliveryCharge, useDeliveryChargeRules } from "@/lib/order-pricing";
+import { resolveAssetUrl } from "@/lib/asset-url";
+
+const CART_FALLBACK_IMAGE = "/images/gallery-1.png";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, totalCount, totalPrice, clearCart } = useCart();
@@ -81,11 +84,11 @@ export function CartDrawer() {
                       className="flex gap-3 rounded-xl bg-muted/40 p-3"
                     >
                       <img
-                    src={resolveAssetUrl(item.imageUrl)}
+                        src={resolveAssetUrl(item.imageUrl) || CART_FALLBACK_IMAGE}
                         alt={item.name}
                         className="h-16 w-16 shrink-0 rounded-lg object-cover"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = "https://placehold.co/64x64/e8f5e8/4a7c59?text=Plant";
+                          (e.target as HTMLImageElement).src = CART_FALLBACK_IMAGE;
                         }}
                       />
                       <div className="min-w-0 flex-1">
@@ -185,4 +188,3 @@ export function CartDrawer() {
     </>
   );
 }
-import { resolveAssetUrl } from "@/lib/asset-url";

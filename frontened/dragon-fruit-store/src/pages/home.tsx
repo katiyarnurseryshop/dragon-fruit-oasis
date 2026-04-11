@@ -14,7 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SITE_CONTACT } from "@/lib/site-contact";
-import { resolveAssetUrl } from "@/lib/asset-url";
+import { getProductPrimaryImage, resolveAssetUrl } from "@/lib/asset-url";
 import { OrderFormDialog } from "@/components/order-form-dialog";
 import { OrderLineItem } from "@/lib/order-pricing";
 import {
@@ -133,7 +133,7 @@ export default function Home() {
         name: product.name,
         price: product.price,
         unit: product.unit,
-        imageUrl: product.imageUrl,
+        imageUrl: getProductPrimaryImage(product),
         quantity: 1,
       },
     ]);
@@ -360,7 +360,7 @@ export default function Home() {
                                     name: product.name,
                                     price: product.price,
                                     unit: product.unit,
-                                    imageUrl: product.imageUrl,
+                                    imageUrl: getProductPrimaryImage(product),
                                   });
                                 }}
                               >
@@ -466,8 +466,8 @@ export default function Home() {
                                 name: product.name,
                                 price: product.price,
                                 unit: product.unit,
-                                imageUrl: product.imageUrl,
-                              });
+                                    imageUrl: getProductPrimaryImage(product),
+                                  });
                             }}
                           >
                             <ShoppingCart className="w-4 h-4 mr-2" />
