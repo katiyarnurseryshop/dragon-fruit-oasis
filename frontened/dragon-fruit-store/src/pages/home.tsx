@@ -263,9 +263,9 @@ export default function Home() {
             transition={{ duration: 1, delay: 1 }}
             className="flex flex-wrap justify-center gap-x-6 gap-y-3 mt-10 md:mt-20 text-sm md:text-base font-medium text-zinc-200"
           >
-            <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> 100% Natural</div>
-            <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> Farm-to-home</div>
-            <div className="flex items-center gap-2 text-[#050505]"><CheckCircle2 className="w-5 h-5 text-secondary" /> Secure Payments</div>
+            <div className="flex items-center gap-2 text-white drop-shadow-md"><CheckCircle2 className="w-5 h-5 text-secondary" /> 100% Natural</div>
+            <div className="flex items-center gap-2 text-white drop-shadow-md"><CheckCircle2 className="w-5 h-5 text-secondary" /> Farm-to-home</div>
+            <div className="flex items-center gap-2 text-white drop-shadow-md"><CheckCircle2 className="w-5 h-5 text-secondary" /> Secure Payments</div>
           </motion.div>
         </div>
       </section>
