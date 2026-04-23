@@ -323,10 +323,6 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                 </Button>
               </div>
             </div>
-
-            <p className="text-xs text-muted-foreground mt-4 text-center">
-              Free delivery on orders above ₹500. Prepaid orders only across India.
-            </p>
           </motion.div>
         </div>
 
@@ -450,3 +446,4 @@ export default function ProductDetail({ params }: ProductDetailProps) {
     </div>
   );
 }
+

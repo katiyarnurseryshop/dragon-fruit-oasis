@@ -252,7 +252,7 @@ export default function Home() {
           >
             <Link href="/products" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto bg-secondary hover:bg-secondary/90 text-white font-semibold text-lg h-16 px-10 rounded-full shadow-2xl shadow-secondary/20 hover:shadow-secondary/40 transition-all hover:-translate-y-1">
-                Catalog / Price List
+                Catalogue
               </Button>
             </Link>
           </motion.div>

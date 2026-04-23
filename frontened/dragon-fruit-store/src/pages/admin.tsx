@@ -155,7 +155,7 @@ async function readFileAsDataUrl(file: File) {
 
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen overflow-y-auto bg-[linear-gradient(135deg,#fff8fb_0%,#fffdf8_50%,#f5fff8_100%)] p-3 md:h-screen md:overflow-hidden md:p-5 dark:bg-[linear-gradient(135deg,#160a10_0%,#130f0b_50%,#08140e_100%)]">
+    <div className="min-h-[100dvh] overflow-y-auto bg-[linear-gradient(135deg,#fff8fb_0%,#fffdf8_50%,#f5fff8_100%)] p-3 md:min-h-screen md:p-5 dark:bg-[linear-gradient(135deg,#160a10_0%,#130f0b_50%,#08140e_100%)]">
       {children}
     </div>
   );
@@ -340,7 +340,7 @@ function AdminShellSkeleton() {
           </div>
         </aside>
 
-        <main className="overflow-visible rounded-[30px] border border-black/10 bg-white/70 p-4 shadow-[0_18px_40px_rgba(132,24,58,0.08)] backdrop-blur md:h-full md:overflow-hidden md:p-5 dark:border-white/10 dark:bg-white/5 dark:shadow-none">
+        <main className="overflow-y-auto rounded-[30px] border border-black/10 bg-white/70 p-4 shadow-[0_18px_40px_rgba(132,24,58,0.08)] backdrop-blur md:h-full md:p-5 dark:border-white/10 dark:bg-white/5 dark:shadow-none">
           <div className="mb-4 space-y-3 md:hidden">
             <Skeleton className="h-24 w-full rounded-[26px]" />
             <div className="flex gap-2 overflow-hidden">

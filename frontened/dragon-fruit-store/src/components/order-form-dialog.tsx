@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Minus, Plus, MapPin, MessageCircle, Phone, ShoppingBag, User, Home, Landmark, MapPinned } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,14 +56,17 @@ export function OrderFormDialog({
   const [form, setForm] = useState<OrderCustomerDetails>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof OrderCustomerDetails, string>>>({});
   const [localItems, setLocalItems] = useState<OrderLineItem[]>(items);
+  const wasOpenRef = useRef(open);
   const deliveryChargeRules = useDeliveryChargeRules();
 
   useEffect(() => {
-    if (open) {
+    const openedNow = open && !wasOpenRef.current;
+    if (openedNow) {
       setLocalItems(items);
       setForm(EMPTY_FORM);
       setErrors({});
     }
+    wasOpenRef.current = open;
   }, [items, open]);
 
   const orderItems = onItemsChange ? items : localItems;
