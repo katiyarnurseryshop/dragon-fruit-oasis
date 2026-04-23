@@ -159,7 +159,7 @@ export function createOrderMessage(items: OrderLineItem[], customer: OrderCustom
 
   const productLines = items.map(
     (item, index) =>
-      `${index + 1}. ${item.name}\n   Quantity: ${item.quantity}\n   Price: ${formatCurrency(item.price)} each\n   Line Total: ${formatCurrency(item.price * item.quantity)}`,
+      `${index + 1}. ${item.name}\n   Quantity: ${item.quantity}\n   Price: ${formatCurrency(item.price)} each`,
   );
 
   return [
