@@ -506,6 +506,7 @@ export default function Admin() {
 
   useEffect(() => {
     if (authState === "authenticated") {
+      setActiveSection("overview");
       void loadDashboard();
     }
   }, [authState]);
@@ -722,7 +723,14 @@ export default function Admin() {
   }
 
   if (authState !== "authenticated") {
-    return <AdminLogin onSuccess={() => setAuthState("authenticated")} />;
+    return (
+      <AdminLogin
+        onSuccess={() => {
+          setActiveSection("overview");
+          setAuthState("authenticated");
+        }}
+      />
+    );
   }
 
   return (
@@ -873,7 +881,7 @@ export default function Admin() {
           </div>
 
           {activeSection === "overview" && (
-            <div className="flex h-full flex-col gap-4 md:gap-5">
+            <div className="flex flex-col gap-4 md:h-full md:gap-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
                 <div>
                   <h1 className="font-heading text-3xl font-bold text-[#2f141d] dark:text-white md:text-4xl">
