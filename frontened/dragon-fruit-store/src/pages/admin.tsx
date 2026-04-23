@@ -469,7 +469,11 @@ export default function Admin() {
     try {
       const response = await fetch(ADMIN_DASHBOARD_URL, { credentials: "include" });
       if (response.status === 401) {
-        setAuthState("unauthenticated");
+        setDashboardData(null);
+        toast({
+          title: "Dashboard data unavailable",
+          description: "Login worked, but dashboard summary could not be loaded right now.",
+        });
         return;
       }
       if (!response.ok) {
@@ -492,10 +496,13 @@ export default function Admin() {
       try {
         const response = await fetch(ADMIN_SESSION_URL, { credentials: "include" });
         if (!mounted) return;
-        setAuthState(response.ok ? "authenticated" : "unauthenticated");
+        setAuthState((current) => {
+          if (current === "authenticated") return current;
+          return response.ok ? "authenticated" : "unauthenticated";
+        });
       } catch {
         if (!mounted) return;
-        setAuthState("unauthenticated");
+        setAuthState((current) => (current === "authenticated" ? current : "unauthenticated"));
       }
     };
     void checkSession();
