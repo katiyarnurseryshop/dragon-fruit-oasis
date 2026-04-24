@@ -155,14 +155,18 @@
   z-index: 2;
   top: 50%;
   left: -10%;
+  width: 1.35rem;
+  height: 1.35rem;
   transform: translate(-50%, -50%);
 }
 
 .add-to-cart-animated .box-icon {
   position: absolute;
   z-index: 3;
-  top: -22%;
+  top: -24%;
   left: 52%;
+  width: 0.95rem;
+  height: 0.95rem;
   transform: translate(-50%, -50%);
 }
 
@@ -216,14 +220,14 @@
 @keyframes add-to-cart-box {
   0%,
   40% {
-    top: -22%;
+    top: -24%;
   }
   60% {
-    top: 40%;
+    top: 48%;
     left: 52%;
   }
   100% {
-    top: 40%;
+    top: 48%;
     left: 112%;
   }
 }
