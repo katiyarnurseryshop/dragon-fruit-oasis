@@ -292,33 +292,31 @@ export default function ProductDetail({ params }: ProductDetailProps) {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-auto">
+            <div className="grid grid-cols-2 gap-3 mt-auto">
               <Button
                 data-testid="button-order-whatsapp"
-                className="flex-1 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold h-14 rounded-xl gap-2 text-base shadow-lg shadow-secondary/20"
+                className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold h-14 rounded-xl gap-2 text-base shadow-lg shadow-secondary/20"
                 onClick={openBuyNowForm}
                 disabled={!product.inStock}
               >
                 <MessageCircle className="w-5 h-5" />
                 Buy Now
               </Button>
-              <div className="sm:w-auto">
-                <AnimatedAddToCartButton
-                  variant="outline"
-                  className="w-full h-14 rounded-xl gap-2 font-semibold border-2"
-                  data-testid="button-add-to-cart"
-                  disabled={!product.inStock}
-                  onAddToCart={() =>
-                    addItem({
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      unit: product.unit,
-                      imageUrl: getProductPrimaryImage(product),
-                    })
-                  }
-                />
-              </div>
+              <AnimatedAddToCartButton
+                variant="outline"
+                className="w-full h-14 rounded-xl gap-2 font-semibold border-2"
+                data-testid="button-add-to-cart"
+                disabled={!product.inStock}
+                onAddToCart={() =>
+                  addItem({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    unit: product.unit,
+                    imageUrl: getProductPrimaryImage(product),
+                  })
+                }
+              />
             </div>
           </motion.div>
         </div>
