@@ -16,6 +16,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { SITE_CONTACT } from "@/lib/site-contact";
 import { getProductPrimaryImage, resolveAssetUrl } from "@/lib/asset-url";
 import { OrderFormDialog } from "@/components/order-form-dialog";
+import { AnimatedAddToCartButton } from "@/components/animated-add-to-cart-button";
 import { OrderLineItem } from "@/lib/order-pricing";
 import {
   type CarouselApi,
@@ -40,7 +41,6 @@ import {
   X,
   MessageCircle,
   ArrowRight,
-  ShoppingCart,
   Instagram,
   Facebook,
   ExternalLink,
@@ -350,10 +350,10 @@ export default function Home() {
                               </div>
                             </div>
                             <div className="flex gap-2">
-                              <Button
+                              <AnimatedAddToCartButton
                                 className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-11 rounded-full shadow-lg text-sm"
                                 disabled={!product.inStock}
-                                onClick={(e) => {
+                                onAddToCart={(e) => {
                                   e.stopPropagation();
                                   addItem({
                                     id: product.id,
@@ -363,10 +363,7 @@ export default function Home() {
                                     imageUrl: getProductPrimaryImage(product),
                                   });
                                 }}
-                              >
-                                <ShoppingCart className="w-4 h-4 mr-2" />
-                                Add to Cart
-                              </Button>
+                              />
                               <Button
                                 variant="outline"
                                 size="icon"
@@ -456,10 +453,10 @@ export default function Home() {
                           </span>
                         </div>
                         <div className="flex gap-3">
-                          <Button
+                          <AnimatedAddToCartButton
                             className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 rounded-full shadow-lg"
                             disabled={!product.inStock}
-                            onClick={(e) => {
+                            onAddToCart={(e) => {
                               e.stopPropagation();
                               addItem({
                                 id: product.id,
@@ -469,10 +466,7 @@ export default function Home() {
                                     imageUrl: getProductPrimaryImage(product),
                                   });
                             }}
-                          >
-                            <ShoppingCart className="w-4 h-4 mr-2" />
-                            Add to Cart
-                          </Button>
+                          />
                           <Button
                             variant="outline"
                             size="icon"

@@ -11,6 +11,7 @@ import { SITE_CONTACT } from "@/lib/site-contact";
 import { getProductPrimaryImage, resolveAssetUrl } from "@/lib/asset-url";
 import { useCart } from "@/context/cart-context";
 import { OrderFormDialog } from "@/components/order-form-dialog";
+import { AnimatedAddToCartButton } from "@/components/animated-add-to-cart-button";
 import { OrderLineItem } from "@/lib/order-pricing";
 import {
   ArrowLeft,
@@ -21,7 +22,6 @@ import {
   Package,
   CheckCircle2,
   Star,
-  ShoppingCart,
   ChevronRight,
 } from "lucide-react";
 
@@ -47,7 +47,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
       ? new URLSearchParams(window.location.search).get("source")
       : null;
   const backHref = source === "home" ? "/" : "/products";
-  const backLabel = source === "home" ? "Back to Home" : "Back to Catalog";
+  const backLabel = source === "home" ? "Back to Home" : "Back to Catalogue";
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -303,12 +303,12 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                 Buy Now
               </Button>
               <div className="sm:w-auto">
-                <Button
+                <AnimatedAddToCartButton
                   variant="outline"
                   className="w-full h-14 rounded-xl gap-2 font-semibold border-2"
                   data-testid="button-add-to-cart"
                   disabled={!product.inStock}
-                  onClick={() =>
+                  onAddToCart={() =>
                     addItem({
                       id: product.id,
                       name: product.name,
@@ -317,10 +317,7 @@ export default function ProductDetail({ params }: ProductDetailProps) {
                       imageUrl: getProductPrimaryImage(product),
                     })
                   }
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
-                </Button>
+                />
               </div>
             </div>
           </motion.div>

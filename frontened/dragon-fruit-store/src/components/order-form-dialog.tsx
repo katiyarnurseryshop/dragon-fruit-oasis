@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Minus, Plus, MapPin, MessageCircle, Phone, ShoppingBag, User, Home, Landmark, MapPinned } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { MapPin, MessageCircle, Phone, User, Home, Landmark, MapPinned } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,19 +11,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { createWhatsAppOrderUrl } from "@/lib/site-contact";
-import { resolveAssetUrl } from "@/lib/asset-url";
 import {
   OrderLineItem,
   OrderCustomerDetails,
   createOrderMessage,
-  formatCurrency,
-  getDeliveryCharge,
-  getOrderSubtotal,
-  getTotalPlantQuantity,
-  useDeliveryChargeRules,
 } from "@/lib/order-pricing";
-
-const ORDER_FALLBACK_IMAGE = "/images/gallery-1.png";
 
 interface OrderFormDialogProps {
   open: boolean;
@@ -49,47 +41,23 @@ export function OrderFormDialog({
   open,
   onOpenChange,
   items,
-  onItemsChange,
   title = "Complete your order",
   description = "Fill in your details and continue on WhatsApp with a ready-to-send order message.",
 }: OrderFormDialogProps) {
   const [form, setForm] = useState<OrderCustomerDetails>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof OrderCustomerDetails, string>>>({});
-  const [localItems, setLocalItems] = useState<OrderLineItem[]>(items);
   const wasOpenRef = useRef(open);
-  const deliveryChargeRules = useDeliveryChargeRules();
 
   useEffect(() => {
     const openedNow = open && !wasOpenRef.current;
     if (openedNow) {
-      setLocalItems(items);
       setForm(EMPTY_FORM);
       setErrors({});
     }
     wasOpenRef.current = open;
-  }, [items, open]);
+  }, [open]);
 
-  const orderItems = onItemsChange ? items : localItems;
-  const totalPlants = useMemo(() => getTotalPlantQuantity(orderItems), [orderItems]);
-  const subtotal = useMemo(() => getOrderSubtotal(orderItems), [orderItems]);
-  const deliveryCharge = useMemo(
-    () => getDeliveryCharge(totalPlants, deliveryChargeRules),
-    [deliveryChargeRules, totalPlants],
-  );
-  const orderTotal = subtotal + deliveryCharge;
-
-  const updateItemQuantity = (id: number, quantity: number) => {
-    const nextItems = orderItems
-      .map((item) => (item.id === id ? { ...item, quantity } : item))
-      .filter((item) => item.quantity > 0);
-
-    if (onItemsChange) {
-      onItemsChange(nextItems);
-      return;
-    }
-
-    setLocalItems(nextItems);
-  };
+  const orderItems = items;
 
   const validate = () => {
     const nextErrors: Partial<Record<keyof OrderCustomerDetails, string>> = {};
@@ -132,94 +100,14 @@ export function OrderFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-3xl border-0 bg-white p-0 shadow-2xl dark:bg-zinc-950 sm:w-full">
-        <div className="grid max-h-[92vh] overflow-hidden md:grid-cols-[1.15fr_0.85fr]">
-          <div className="overflow-y-auto bg-gradient-to-br from-primary via-primary/95 to-secondary p-5 text-white md:p-8">
+      <DialogContent className="w-[calc(100vw-1.5rem)] max-w-xl border-0 bg-white p-0 shadow-2xl dark:bg-zinc-950 sm:w-full">
+        <div className="flex max-h-[92vh] min-h-0 flex-col bg-white dark:bg-zinc-950">
+          <div className="border-b border-border/70 px-5 py-4 md:px-8 md:py-6">
             <DialogHeader className="text-left">
               <DialogTitle className="pr-10 font-heading text-2xl md:text-3xl">{title}</DialogTitle>
-              <DialogDescription className="text-white/80">{description}</DialogDescription>
+              <DialogDescription>{description}</DialogDescription>
             </DialogHeader>
-
-            <div className="mt-6 space-y-4">
-              <div className="rounded-3xl bg-white/10 p-4 backdrop-blur-sm">
-                <div className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-white/75">
-                  <ShoppingBag className="h-4 w-4" />
-                  Order Summary
-                </div>
-
-                <div className="space-y-3">
-                  {orderItems.length === 0 ? (
-                    <p className="text-sm text-white/80">No products selected yet.</p>
-                  ) : (
-                    orderItems.map((item) => (
-                      <div key={item.id} className="rounded-2xl bg-black/15 p-3">
-                        <div className="flex items-start gap-3">
-                          <img
-                            src={resolveAssetUrl(item.imageUrl) || ORDER_FALLBACK_IMAGE}
-                            alt={item.name}
-                            className="h-14 w-14 rounded-xl object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = ORDER_FALLBACK_IMAGE;
-                            }}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold">{item.name}</p>
-                            <p className="text-xs text-white/70">
-                              {formatCurrency(item.price)} / {item.unit}
-                            </p>
-                            <div className="mt-3 flex items-center justify-between gap-3">
-                              <div className="flex items-center rounded-full border border-white/20 bg-white/10 px-1 py-1">
-                                <button
-                                  type="button"
-                                  onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                                  className="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-white/10"
-                                  aria-label={`Decrease quantity for ${item.name}`}
-                                >
-                                  <Minus className="h-3.5 w-3.5" />
-                                </button>
-                                <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                                  className="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-white/10"
-                                  aria-label={`Increase quantity for ${item.name}`}
-                                >
-                                  <Plus className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
-                              <span className="text-sm font-semibold">
-                                {formatCurrency(item.price * item.quantity)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                <div className="mt-4 space-y-2 border-t border-white/15 pt-4 text-sm">
-                  <div className="flex items-center justify-between text-white/80">
-                    <span>Total Plants</span>
-                    <span>{totalPlants}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-white/80">
-                    <span>Subtotal</span>
-                    <span>{formatCurrency(subtotal)}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-white/80">
-                    <span>Delivery Charge</span>
-                    <span>{formatCurrency(deliveryCharge)}</span>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-white/15 pt-3 text-base font-bold">
-                    <span>Total</span>
-                    <span>{formatCurrency(orderTotal)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
-
           <div className="flex max-h-[50vh] min-h-0 flex-col bg-white dark:bg-zinc-950 md:max-h-[92vh]">
             <div className="flex-1 overflow-y-auto p-5 md:p-8">
               <div className="space-y-5">
@@ -352,7 +240,7 @@ export function OrderFormDialog({
               </Button>
             </div>
           </div>
-        </div>
+      </div>
       </DialogContent>
     </Dialog>
   );

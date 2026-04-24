@@ -12,6 +12,7 @@ import { useCart } from "@/context/cart-context";
 import { SITE_CONTACT } from "@/lib/site-contact";
 import { getProductPrimaryImage, resolveAssetUrl } from "@/lib/asset-url";
 import { OrderFormDialog } from "@/components/order-form-dialog";
+import { AnimatedAddToCartButton } from "@/components/animated-add-to-cart-button";
 import { OrderLineItem } from "@/lib/order-pricing";
 import {
   Search,
@@ -25,7 +26,6 @@ import {
   ChevronRight,
   Star,
   ArrowRight,
-  ShoppingCart,
   MessageCircle,
 } from "lucide-react";
 
@@ -146,7 +146,7 @@ export default function ProductsCatalog() {
               Katiyar Dragon Fruit Nursery
             </Badge>
             <h1 className="font-heading font-bold text-4xl md:text-6xl mb-4 text-foreground">
-              Our Plant Catalog
+              Our Plant Catalogue
             </h1>
             <p className="text-muted-foreground text-lg max-w-xl mx-auto">
               50+ premium dragon fruit varieties — handpicked, organically grown, and shipped fresh from {SITE_CONTACT.locationLabel}.
@@ -318,10 +318,10 @@ export default function ProductsCatalog() {
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      <Button
+                      <AnimatedAddToCartButton
                         className="w-full rounded-full h-9 text-sm font-semibold gap-2"
                         disabled={!product.inStock}
-                        onClick={(e) => {
+                        onAddToCart={(e) => {
                           e.stopPropagation();
                           addItem({
                             id: product.id,
@@ -331,10 +331,7 @@ export default function ProductsCatalog() {
                             imageUrl: getProductPrimaryImage(product),
                           });
                         }}
-                      >
-                        <ShoppingCart className="w-4 h-4" />
-                        Add to Cart
-                      </Button>
+                      />
                       <Button
                         variant="outline"
                         className="w-full rounded-full h-9 text-sm font-semibold gap-2 border-primary/30 hover:bg-primary/5"
