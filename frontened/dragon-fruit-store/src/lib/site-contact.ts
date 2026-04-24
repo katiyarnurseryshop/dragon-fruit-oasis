@@ -1,8 +1,8 @@
 export const SITE_CONTACT = {
-  whatsappNumber: "916387456172",
+  whatsappNumber: "918112929020",
   phoneDisplay: "+91 63874 56172",
   phoneHref: "tel:+916387456172",
-  whatsappHref: "https://wa.me/916387456172",
+  whatsappHref: "https://wa.me/918112929020",
   email: "katiyarnursery@gmail.com",
   emailHref: "mailto:katiyarnursery@gmail.com",
   instagramHref:
