@@ -51,6 +51,12 @@ app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true, limit: "8mb" }));
 app.use("/uploads", express.static(PRODUCT_UPLOADS_DIR));
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+  });
+});
+
 app.use("/api", router);
 
 export default app;
